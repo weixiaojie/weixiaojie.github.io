@@ -4,21 +4,21 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   
-  <title>使用cheerio爬取gank-io妹子图 | 超级大馒头</title>
+  <title>Bitmap和Bloom-filter | 超级大馒头</title>
   <meta name="description" content="A amazing blog." />
   <meta name="keywords" content="hexo,theme,mantou,plus" />
   <meta name="HandheldFriendly" content="True" />
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="cheerio是nodejs的抓取页面模块，只需输入html，然后就可以像Jquery一样获取dom结构信息： const cheerio &#x3D; require(&#39;cheerio&#39;) const $ &#x3D; cheerio.load(&#39;&lt;h2 class&#x3D;&quot;title&quot;&gt;Hello world&lt;&#x2F;h2&gt;&#39;)   $(&#39;h">
+  <meta name="description" content="使用bitmap可以减少存储空间，同时可以方便的做位运算：（&amp;、|、^、~、&gt;&gt;、&lt;&lt;）">
 <meta property="og:type" content="article">
-<meta property="og:title" content="使用cheerio爬取gank-io妹子图">
-<meta property="og:url" content="http://mantou.plus/2018/11/13/%E4%BD%BF%E7%94%A8cheerio%E7%88%AC%E5%8F%96gank-io%E5%A6%B9%E5%AD%90%E5%9B%BE/index.html">
+<meta property="og:title" content="Bitmap和Bloom-filter">
+<meta property="og:url" content="http://mantou.plus/2021/06/17/bitmap/index.html">
 <meta property="og:site_name" content="超级大馒头">
-<meta property="og:description" content="cheerio是nodejs的抓取页面模块，只需输入html，然后就可以像Jquery一样获取dom结构信息： const cheerio &#x3D; require(&#39;cheerio&#39;) const $ &#x3D; cheerio.load(&#39;&lt;h2 class&#x3D;&quot;title&quot;&gt;Hello world&lt;&#x2F;h2&gt;&#39;)   $(&#39;h">
+<meta property="og:description" content="使用bitmap可以减少存储空间，同时可以方便的做位运算：（&amp;、|、^、~、&gt;&gt;、&lt;&lt;）">
 <meta property="og:locale">
-<meta property="article:published_time" content="2018-11-12T16:00:00.000Z">
-<meta property="article:modified_time" content="2021-06-19T17:06:20.481Z">
+<meta property="article:published_time" content="2021-06-16T16:00:00.000Z">
+<meta property="article:modified_time" content="2021-06-17T15:15:28.268Z">
 <meta property="article:author" content="weixiaojie">
 <meta name="twitter:card" content="summary">
   
@@ -105,81 +105,25 @@
     <script>NProgress.set(0.4);</script>
     
     <main id="main" role="main">
-      <article id="post-使用cheerio爬取gank-io妹子图"
+      <article id="post-bitmap"
   class="post article white-box article-type-post animated fade-in-top"
   itemscope itemprop="blogPost">
   <section class="post-header article-header">
     <h2 class="title">
-        <a href="/2018/11/13/%E4%BD%BF%E7%94%A8cheerio%E7%88%AC%E5%8F%96gank-io%E5%A6%B9%E5%AD%90%E5%9B%BE/">
-          使用cheerio爬取gank-io妹子图
+        <a href="/2021/06/17/bitmap/">
+          Bitmap和Bloom-filter
         </a>
       </h2>
       <div class="subtitle">
           <time>
-            2018年11月13日
+            2021年06月17日
           </time>
           
       </div>
   </section>
   <section class="content">
     <div class="article-entry" itemprop="articleBody">
-      <p><code>cheerio</code>是<code>nodejs</code>的抓取页面模块，只需输入<code>html</code>，然后就可以像<code>Jquery</code>一样获取<code>dom</code>结构信息：</p>
-<pre><code>const cheerio = require(&#39;cheerio&#39;)
-const $ = cheerio.load(&#39;&lt;h2 class=&quot;title&quot;&gt;Hello world&lt;/h2&gt;&#39;)
- 
-$(&#39;h2.title&#39;).text(&#39;Hello there!&#39;)
-$(&#39;h2&#39;).addClass(&#39;welcome&#39;)
- 
-$.html()
-//=&gt; &lt;html&gt;&lt;head&gt;&lt;/head&gt;&lt;body&gt;&lt;h2 class=&quot;title welcome&quot;&gt;Hello there!&lt;/h2&gt;&lt;/body&gt;&lt;/html&gt;
-</code></pre>
-<h3 id="命令终端（空目录下）"><a href="#命令终端（空目录下）" class="headerlink" title="命令终端（空目录下）"></a><code>命令终端（空目录下）</code></h3><pre><code>npm init（一直回车初始化项目）
-npm install cheerio --save（安装依赖）
-npm install request --save（安装依赖）
-node index.js（启动爬取脚本）
-</code></pre>
-<h3 id="index-js"><a href="#index-js" class="headerlink" title="index.js"></a><code>index.js</code></h3><pre><code>// 加载http模块
-var https = require(&#39;https&#39;);
-var http = require(&#39;http&#39;);
-var fs = require(&#39;fs&#39;);
-var request = require(&#39;request&#39;);
-var cheerio = require(&#39;cheerio&#39;);
-// process.env.NODE_TLS_REJECT_UNAUTHORIZED = &#39;0&#39;;
-//获取网页信息
-function getGank() &#123;
-    for (let page = 1; page &lt;= 10; page++) &#123;
-        request(&#39;https://gank.io/special/Girl/page/&#39; + page, (error, response, body) =&gt; &#123;
-            var $ = cheerio.load(body);
-            //此处的选择器需要根据网站的更新不断的改变
-            var imageArray = $(&quot;div.container div.list-archive div.list-item&quot;);
-            imageArray.each((index, ele) =&gt; &#123;
-                var style = cheerio.load(ele)(&quot;div.media a&quot;).attr(&quot;style&quot;);
-                let res = style.match(/&#39;(.*?)&#39;/)[1]
-                let fileName = &#39;./image/&#39; + page + index + &#39;.jpg&#39;;
-                fs.exists(fileName, function (exists) &#123;
-                    if (!exists) &#123;
-                        let stream = fs.createWriteStream(fileName);
-                        request(&quot;https://gank.io/&quot; + res).pipe(stream).on(&#39;close&#39;, () =&gt; &#123;
-                            console.log(`文件:$&#123;fileName&#125;下载完毕`)
-                        &#125;);
-                    &#125;
-                &#125;);
-            &#125;);
-        &#125;)
-    &#125;
-&#125;
-
-fs.exists(&quot;./image&quot;, function (exists) &#123;
-    console.log(&quot;当前目录是否存在image文件夹：&quot; + exists);
-    exists ? getGank() : fs.mkdir(&quot;./image&quot;, function (err) &#123;
-        if (err) &#123;
-            return console.error(err);
-        &#125;
-        console.log(&quot;目录创建成功。&quot;);
-        getGank();
-    &#125;);
-&#125;);
-</code></pre>
+      <p>使用bitmap可以减少存储空间，同时可以方便的做位运算：（&amp;、|、^、~、&gt;&gt;、&lt;&lt;）</p>
 
     </div>
   </section>
