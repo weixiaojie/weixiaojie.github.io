@@ -18,7 +18,7 @@
 <meta property="og:description" content="cheerio是nodejs的抓取页面模块，只需输入html，然后就可以像Jquery一样获取dom结构信息： const cheerio &#x3D; require(&#39;cheerio&#39;) const $ &#x3D; cheerio.load(&#39;&lt;h2 class&#x3D;&quot;title&quot;&gt;Hello world&lt;&#x2F;h2&gt;&#39;)   $(&#39;h">
 <meta property="og:locale">
 <meta property="article:published_time" content="2018-11-12T16:00:00.000Z">
-<meta property="article:modified_time" content="2021-06-19T17:06:20.481Z">
+<meta property="article:modified_time" content="2021-06-19T17:08:08.207Z">
 <meta property="article:author" content="weixiaojie">
 <meta name="twitter:card" content="summary">
   
@@ -145,7 +145,6 @@ var fs = require(&#39;fs&#39;);
 var request = require(&#39;request&#39;);
 var cheerio = require(&#39;cheerio&#39;);
 // process.env.NODE_TLS_REJECT_UNAUTHORIZED = &#39;0&#39;;
-//获取网页信息
 function getGank() &#123;
     for (let page = 1; page &lt;= 10; page++) &#123;
         request(&#39;https://gank.io/special/Girl/page/&#39; + page, (error, response, body) =&gt; &#123;
