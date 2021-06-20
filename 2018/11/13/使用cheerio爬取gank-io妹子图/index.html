@@ -18,7 +18,7 @@
 <meta property="og:description" content="cheerio是nodejs的抓取页面模块，只需输入html，然后就可以像Jquery一样获取dom结构信息： const cheerio &#x3D; require(&#39;cheerio&#39;) const $ &#x3D; cheerio.load(&#39;&lt;h2 class&#x3D;&quot;title&quot;&gt;Hello world&lt;&#x2F;h2&gt;&#39;)   $(&#39;h">
 <meta property="og:locale">
 <meta property="article:published_time" content="2018-11-12T16:00:00.000Z">
-<meta property="article:modified_time" content="2021-06-19T17:17:56.886Z">
+<meta property="article:modified_time" content="2021-06-20T14:29:24.760Z">
 <meta property="article:author" content="weixiaojie">
 <meta name="twitter:card" content="summary">
   
@@ -138,10 +138,7 @@ npm install cheerio --save（安装依赖）
 npm install request --save（安装依赖）
 node index.js（启动爬取脚本）
 </code></pre>
-<h3 id="index-js"><a href="#index-js" class="headerlink" title="index.js"></a><code>index.js</code></h3><pre><code>// 加载http模块
-var https = require(&#39;https&#39;);
-var http = require(&#39;http&#39;);
-var fs = require(&#39;fs&#39;);
+<h3 id="index-js"><a href="#index-js" class="headerlink" title="index.js"></a><code>index.js</code></h3><pre><code>var fs = require(&#39;fs&#39;);
 var request = require(&#39;request&#39;);
 var cheerio = require(&#39;cheerio&#39;);
 // process.env.NODE_TLS_REJECT_UNAUTHORIZED = &#39;0&#39;;
