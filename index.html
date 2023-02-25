@@ -172,6 +172,63 @@ JDK ProxyGenerator、CGLIB、Javassist、ASM
   <section class="post-header">
     
       <h2 class="title">
+        <a href="/2021/06/23/Java%E5%BB%B6%E6%97%B6%E9%98%9F%E5%88%97/">
+          Java延时队列
+        </a>
+      </h2>
+      
+      <div class="subtitle">
+          <time>
+            2021年06月23日
+          </time>
+          
+      </div>
+  </section>
+  <section class="content">
+    在业务开发中常常存在超时处理机制，比如订单多久没支付自动取消，命令执行太久自动取消执行之类。可以使用redis的key过期订阅机制，也可以使用rabbitmq的死信队列，亦或是循环轮训数据库等等来实现。在业务量小，无中间件的情况下，就可以考...
+
+    <!-- <div class="readmore">
+      <a href="/2021/06/23/Java%E5%BB%B6%E6%97%B6%E9%98%9F%E5%88%97/" class="iconfont icon-more">Read More</a>
+    </div> -->
+
+  </section>
+</article>
+  
+    <article class="post   animated fade-in-top">
+
+  <section class="post-header">
+    
+      <h2 class="title">
+        <a href="/2021/05/18/%E5%9F%BA%E4%BA%8ERedis%E7%9A%84%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81/">
+          基于Redis的分布式锁
+        </a>
+      </h2>
+      
+      <div class="subtitle">
+          <time>
+            2021年05月18日
+          </time>
+          
+      </div>
+  </section>
+  <section class="content">
+    在集群多机器环境中，为了避免并发导致的冲突问题，就会使用到分布式锁，同一时刻，集群中只有获取到锁的节点能够执行处逻辑，如下：
+package com.cfss.vpower.common.service.impl;
+
+import org....
+
+    <!-- <div class="readmore">
+      <a href="/2021/05/18/%E5%9F%BA%E4%BA%8ERedis%E7%9A%84%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81/" class="iconfont icon-more">Read More</a>
+    </div> -->
+
+  </section>
+</article>
+  
+    <article class="post   animated fade-in-top">
+
+  <section class="post-header">
+    
+      <h2 class="title">
         <a href="/2021/04/07/JAVA%E7%AD%96%E7%95%A5%E6%A8%A1%E5%BC%8F/">
           JAVA策略模式
         </a>

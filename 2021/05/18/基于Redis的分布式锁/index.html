@@ -4,17 +4,21 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   
-  <title>Archives: 2021 | 超级大馒头</title>
+  <title>基于Redis的分布式锁 | 超级大馒头</title>
   <meta name="description" content="A amazing blog." />
   <meta name="keywords" content="hexo,theme,mantou,plus" />
   <meta name="HandheldFriendly" content="True" />
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta property="og:type" content="website">
-<meta property="og:title" content="超级大馒头">
-<meta property="og:url" content="http://example.com/archives/2021/index.html">
+  <meta name="description" content="在集群多机器环境中，为了避免并发导致的冲突问题，就会使用到分布式锁，同一时刻，集群中只有获取到锁的节点能够执行处逻辑，如下： package com.cfss.vpower.common.service.impl;  import org.springframework.beans.factory.annotation.Autowired; import org.springframework.s">
+<meta property="og:type" content="article">
+<meta property="og:title" content="基于Redis的分布式锁">
+<meta property="og:url" content="http://example.com/2021/05/18/%E5%9F%BA%E4%BA%8ERedis%E7%9A%84%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81/index.html">
 <meta property="og:site_name" content="超级大馒头">
+<meta property="og:description" content="在集群多机器环境中，为了避免并发导致的冲突问题，就会使用到分布式锁，同一时刻，集群中只有获取到锁的节点能够执行处逻辑，如下： package com.cfss.vpower.common.service.impl;  import org.springframework.beans.factory.annotation.Autowired; import org.springframework.s">
 <meta property="og:locale">
+<meta property="article:published_time" content="2021-05-17T16:00:00.000Z">
+<meta property="article:modified_time" content="2023-02-25T11:37:48.432Z">
 <meta property="article:author" content="weixiaojie">
 <meta name="twitter:card" content="summary">
   
@@ -101,56 +105,15 @@
     <script>NProgress.set(0.4);</script>
     
     <main id="main" role="main">
-      
-	
-
-
-	<section class="page-header archive">
-    <h1>- <span>2021</span> -</h1>
-  </section>
-
-
-
-
-<section class="post-list">
-	
-    <article class="post   animated fade-in-top">
-
-  <section class="post-header">
-    
-      <h2 class="title">
-        <a href="/2021/06/23/Java%E5%BB%B6%E6%97%B6%E9%98%9F%E5%88%97/">
-          Java延时队列
-        </a>
-      </h2>
-      
-      <div class="subtitle">
-          <time>
-            2021年06月23日
-          </time>
-          
-      </div>
-  </section>
-  <section class="content">
-    在业务开发中常常存在超时处理机制，比如订单多久没支付自动取消，命令执行太久自动取消执行之类。可以使用redis的key过期订阅机制，也可以使用rabbitmq的死信队列，亦或是循环轮训数据库等等来实现。在业务量小，无中间件的情况下，就可以考...
-
-    <!-- <div class="readmore">
-      <a href="/2021/06/23/Java%E5%BB%B6%E6%97%B6%E9%98%9F%E5%88%97/" class="iconfont icon-more">Read More</a>
-    </div> -->
-
-  </section>
-</article>
-  
-    <article class="post   animated fade-in-top">
-
-  <section class="post-header">
-    
-      <h2 class="title">
+      <article id="post-基于Redis的分布式锁"
+  class="post article white-box article-type-post animated fade-in-top"
+  itemscope itemprop="blogPost">
+  <section class="post-header article-header">
+    <h2 class="title">
         <a href="/2021/05/18/%E5%9F%BA%E4%BA%8ERedis%E7%9A%84%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81/">
           基于Redis的分布式锁
         </a>
       </h2>
-      
       <div class="subtitle">
           <time>
             2021年05月18日
@@ -159,83 +122,80 @@
       </div>
   </section>
   <section class="content">
-    在集群多机器环境中，为了避免并发导致的冲突问题，就会使用到分布式锁，同一时刻，集群中只有获取到锁的节点能够执行处逻辑，如下：
-package com.cfss.vpower.common.service.impl;
+    <div class="article-entry" itemprop="articleBody">
+      <p>在集群多机器环境中，为了避免并发导致的冲突问题，就会使用到分布式锁，同一时刻，集群中只有获取到锁的节点能够执行处逻辑，如下：</p>
+<pre><code class="java">package com.cfss.vpower.common.service.impl;
 
-import org....
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import redis.clients.jedis.Jedis;
+import redis.clients.jedis.JedisPool;
 
-    <!-- <div class="readmore">
-      <a href="/2021/05/18/%E5%9F%BA%E4%BA%8ERedis%E7%9A%84%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81/" class="iconfont icon-more">Read More</a>
-    </div> -->
+import java.util.Collections;
 
+@Service(&quot;RedisSevice&quot;)
+public class RedisSevice &#123;
+
+    @Autowired
+    JedisPool jedisPool;
+
+    private static final String LOCK_SUCCESS = &quot;OK&quot;;
+    //如果不存在key值就存入redis，如果存在返回失败，过期自动删除
+    private static final String SET_IF_NOT_EXIST = &quot;NX&quot;;
+    private static final String SET_WITH_EXPIRE_TIME = &quot;PX&quot;;
+
+    public boolean tryGetDistributedLock(String lockKey, String value, int expireTime) &#123;
+        Jedis jedis = jedisPool.getResource();
+        //往redis写入key及value，如果key存在返回写入失败表示获取锁失败，key不存在返回写入成功表示获取锁成功
+        String result = jedis.set(lockKey, value, SET_IF_NOT_EXIST, SET_WITH_EXPIRE_TIME, expireTime);
+
+        if (LOCK_SUCCESS.equals(result)) &#123;
+            return true;
+        &#125;
+        return false;
+    &#125;
+
+    private static final Long RELEASE_SUCCESS = 1L;
+
+    public boolean releaseDistributedLock(String lockKey, String value) &#123;
+        Jedis jedis = jedisPool.getResource();
+        /*当A节点获取锁之后执行过久，导致锁过期自动释放，B节点获取到了锁执行逻辑中，
+        这时A执行完毕准备释放锁，如果发现value不是自己设置的，说明当前锁已经不是自己持有，则不能释放*/
+        String script = &quot;if redis.call(&#39;get&#39;, KEYS[1]) == ARGV[1] then return redis.call(&#39;del&#39;, KEYS[1]) else return 0 end&quot;;
+        Object result = jedis.eval(script, Collections.singletonList(lockKey), Collections.singletonList(value));
+
+        if (RELEASE_SUCCESS.equals(result)) &#123;
+            return true;
+        &#125;
+        return false;
+    &#125;
+
+&#125;
+</code></pre>
+<pre><code>    //redis分布式锁key过期时间，防止执行时间过久或者宕机等异常原因导致锁无法释放
+    private static final int EXPIRE_TIME = 30000;
+    public void main(String[] args) &#123;
+        String lockKey = &quot;key值&quot;;
+        String lockValue = &quot;value值，可用集群机器IP表明锁的持有者&quot;;
+        boolean lockable = redisSevice.tryGetDistributedLock(lockKey, lockValue, EXPIRE_TIME);
+        if (lockable) &#123;
+            try &#123;
+                //获取到锁，执行业务逻辑
+            &#125; finally &#123;
+                //执行结束释放锁
+                redisSevice.releaseDistributedLock(lockKey, value);
+            &#125;
+        &#125;
+    &#125;
+</code></pre>
+<p>上述情况主要适用于单机redis，如果是集群，master数据未同步到salve节点时宕机，会导致锁丢失的问题，推荐使用Redisson分布式锁。</p>
+
+    </div>
   </section>
-</article>
+
   
-    <article class="post   animated fade-in-top">
-
-  <section class="post-header">
-    
-      <h2 class="title">
-        <a href="/2021/04/07/JAVA%E7%AD%96%E7%95%A5%E6%A8%A1%E5%BC%8F/">
-          JAVA策略模式
-        </a>
-      </h2>
-      
-      <div class="subtitle">
-          <time>
-            2021年04月07日
-          </time>
-          
-      </div>
-  </section>
-  <section class="content">
-    在多场景的代码中，需要根据前端传来的参数走不同的代码逻辑，例如：
-public static void main(String[] args) &#123;
-        String code = &quot;前端传来的场景码&quot...
-
-    <!-- <div class="readmore">
-      <a href="/2021/04/07/JAVA%E7%AD%96%E7%95%A5%E6%A8%A1%E5%BC%8F/" class="iconfont icon-more">Read More</a>
-    </div> -->
-
-  </section>
-</article>
   
-    <article class="post   animated fade-in-top">
-
-  <section class="post-header">
-    
-      <h2 class="title">
-        <a href="/2021/03/05/kafka%E6%9E%B6%E6%9E%84/">
-          kafka架构
-        </a>
-      </h2>
-      
-      <div class="subtitle">
-          <time>
-            2021年03月05日
-          </time>
-          
-      </div>
-  </section>
-  <section class="content">
-    Kafka是一个分布式的消息队列，其架构如下：
-
-
-Broker ：一台 kafka 服务器就是一个 broker。一个集群由多个 broker 组成。一个 broker可以容纳多个topic；
-
-Producer ：消息生产者，就是向 k...
-
-    <!-- <div class="readmore">
-      <a href="/2021/03/05/kafka%E6%9E%B6%E6%9E%84/" class="iconfont icon-more">Read More</a>
-    </div> -->
-
-  </section>
 </article>
-  
-</section>
-
-
-
       <script>NProgress.set(0.6);</script>
     </main>
     
