@@ -18,7 +18,7 @@
 <meta property="og:description" content="在集群多机器环境中，为了避免并发导致的冲突问题，就会使用到分布式锁，同一时刻，集群中只有获取到锁的节点能够执行处逻辑，如下： import org.springframework.beans.factory.annotation.Autowired; import org.springframework.stereotype.Service; import redis.clients.jedis.">
 <meta property="og:locale">
 <meta property="article:published_time" content="2021-05-17T16:00:00.000Z">
-<meta property="article:modified_time" content="2023-02-25T11:46:03.418Z">
+<meta property="article:modified_time" content="2023-02-25T11:51:19.564Z">
 <meta property="article:author" content="weixiaojie">
 <meta name="twitter:card" content="summary">
   
@@ -138,8 +138,10 @@ public class RedisSevice &#123;
     JedisPool jedisPool;
 
     private static final String LOCK_SUCCESS = &quot;OK&quot;;
+    
     //如果不存在key值就存入redis，如果存在返回失败，过期自动删除
     private static final String SET_IF_NOT_EXIST = &quot;NX&quot;;
+    
     private static final String SET_WITH_EXPIRE_TIME = &quot;PX&quot;;
 
     public boolean tryGetDistributedLock(String lockKey, String value, int expireTime) &#123;
@@ -170,8 +172,15 @@ public class RedisSevice &#123;
 
 &#125;
 </code></pre>
-<pre><code>    //redis分布式锁key过期时间，防止执行时间过久或者宕机等异常原因导致锁无法释放
+<pre><code>@Component
+public class DistributedLock&#123;
+
+    @Autowired
+    RedisSevice redisSevice;
+    
+    //redis分布式锁key过期时间，防止执行时间过久或者宕机等异常原因导致锁无法释放
     private static final int EXPIRE_TIME = 30000;
+    
     public void main(String[] args) &#123;
         String lockKey = &quot;key值&quot;;
         String lockValue = &quot;value值，可用集群机器IP表明锁的持有者&quot;;
@@ -185,6 +194,7 @@ public class RedisSevice &#123;
             &#125;
         &#125;
     &#125;
+&#125;
 </code></pre>
 <p>上述情况主要适用于单机redis，如果是集群，master数据未同步到salve节点时宕机，会导致锁丢失的问题，推荐使用Redisson分布式锁。</p>
 
