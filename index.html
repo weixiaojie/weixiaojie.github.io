@@ -143,6 +143,65 @@
   <section class="post-header">
     
       <h2 class="title">
+        <a href="/2022/11/07/JVM%E6%9E%B6%E6%9E%84%E5%9B%BE/">
+          JVM架构图
+        </a>
+      </h2>
+      
+      <div class="subtitle">
+          <time>
+            2022年11月07日
+          </time>
+          
+      </div>
+  </section>
+  <section class="content">
+    java开发过程难免会遇到内存溢出，CPU消耗过高等问题，理解JVM结构及其原理有助于排查以上问题，其架构如下：
+
+
+
+    <!-- <div class="readmore">
+      <a href="/2022/11/07/JVM%E6%9E%B6%E6%9E%84%E5%9B%BE/" class="iconfont icon-more">Read More</a>
+    </div> -->
+
+  </section>
+</article>
+  
+    <article class="post   animated fade-in-top">
+
+  <section class="post-header">
+    
+      <h2 class="title">
+        <a href="/2022/10/09/%E4%BA%91%E5%8E%9F%E7%94%9F%E5%BE%AE%E6%9C%8D%E5%8A%A1%E6%9E%B6%E6%9E%84%E5%9B%BE/">
+          云原生微服务架构图
+        </a>
+      </h2>
+      
+      <div class="subtitle">
+          <time>
+            2022年10月09日
+          </time>
+          
+      </div>
+  </section>
+  <section class="content">
+    微服务和容器化已经成为目前互联网架构的主流选择，包含大量的中间件，如下：
+版本1：
+版本2：
+
+
+    <!-- <div class="readmore">
+      <a href="/2022/10/09/%E4%BA%91%E5%8E%9F%E7%94%9F%E5%BE%AE%E6%9C%8D%E5%8A%A1%E6%9E%B6%E6%9E%84%E5%9B%BE/" class="iconfont icon-more">Read More</a>
+    </div> -->
+
+  </section>
+</article>
+  
+    <article class="post   animated fade-in-top">
+
+  <section class="post-header">
+    
+      <h2 class="title">
         <a href="/2022/05/24/%E4%BD%BF%E7%94%A8Javassist%E5%AE%9E%E7%8E%B0AOP/">
           使用Javassist实现AOP
         </a>
@@ -442,6 +501,34 @@ previousValue （第一次调用callbac...
   <section class="post-header">
     
       <h2 class="title">
+        <a href="/2018/08/19/%5B%5D-slice-call(arguments)%E5%8E%9F%E7%90%86%E8%A7%A3%E6%9E%90/">
+          slice.call(arguments)
+        </a>
+      </h2>
+      
+      <div class="subtitle">
+          <time>
+            2018年08月19日
+          </time>
+          
+      </div>
+  </section>
+  <section class="content">
+    javascirpt的类数组对象可以像数组一样使用for循环遍历，但是却不能调用数组原型链的方法，为了让类数组对象可以像数组对象一样调用push，pop等方法，可以将类数组对象转成数组对象：
+将类数组对象转换成数组var args = []...
+
+    <!-- <div class="readmore">
+      <a href="/2018/08/19/%5B%5D-slice-call(arguments)%E5%8E%9F%E7%90%86%E8%A7%A3%E6%9E%90/" class="iconfont icon-more">Read More</a>
+    </div> -->
+
+  </section>
+</article>
+  
+    <article class="post   animated fade-in-top">
+
+  <section class="post-header">
+    
+      <h2 class="title">
         <a href="/2018/08/19/js-setter-&-getter/">
           js-setter-&amp;-getter
         </a>
@@ -464,34 +551,6 @@ previousValue （第一次调用callbac...
 
     <!-- <div class="readmore">
       <a href="/2018/08/19/js-setter-&-getter/" class="iconfont icon-more">Read More</a>
-    </div> -->
-
-  </section>
-</article>
-  
-    <article class="post   animated fade-in-top">
-
-  <section class="post-header">
-    
-      <h2 class="title">
-        <a href="/2018/08/19/%5B%5D-slice-call(arguments)%E5%8E%9F%E7%90%86%E8%A7%A3%E6%9E%90/">
-          slice.call(arguments)
-        </a>
-      </h2>
-      
-      <div class="subtitle">
-          <time>
-            2018年08月19日
-          </time>
-          
-      </div>
-  </section>
-  <section class="content">
-    javascirpt的类数组对象可以像数组一样使用for循环遍历，但是却不能调用数组原型链的方法，为了让类数组对象可以像数组对象一样调用push，pop等方法，可以将类数组对象转成数组对象：
-将类数组对象转换成数组var args = []...
-
-    <!-- <div class="readmore">
-      <a href="/2018/08/19/%5B%5D-slice-call(arguments)%E5%8E%9F%E7%90%86%E8%A7%A3%E6%9E%90/" class="iconfont icon-more">Read More</a>
     </div> -->
 
   </section>
@@ -591,6 +650,33 @@ broken pipe
   <section class="post-header">
     
       <h2 class="title">
+        <a href="/2018/07/01/socket-io%E9%9B%86%E7%BE%A4%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/">
+          socket-io集群解决方案
+        </a>
+      </h2>
+      
+      <div class="subtitle">
+          <time>
+            2018年07月01日
+          </time>
+          
+      </div>
+  </section>
+  <section class="content">
+    关于socket.io的群集解决方案，官网中给出了3个示例代码。除了负载均衡的软件不同，其他的代码其实都是一样的，分别为：nginx,httpd, haproxy。以下以nginx为例说明。官网给的demo基于docker，让你可以直接运行...
+
+    <!-- <div class="readmore">
+      <a href="/2018/07/01/socket-io%E9%9B%86%E7%BE%A4%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/" class="iconfont icon-more">Read More</a>
+    </div> -->
+
+  </section>
+</article>
+  
+    <article class="post   animated fade-in-top">
+
+  <section class="post-header">
+    
+      <h2 class="title">
         <a href="/2018/07/01/%E5%87%BD%E6%95%B0%E9%98%B2%E6%8A%96%E5%92%8C%E5%87%BD%E6%95%B0%E8%8A%82%E6%B5%81/">
           函数防抖和函数节流
         </a>
@@ -610,33 +696,6 @@ broken pipe
 
     <!-- <div class="readmore">
       <a href="/2018/07/01/%E5%87%BD%E6%95%B0%E9%98%B2%E6%8A%96%E5%92%8C%E5%87%BD%E6%95%B0%E8%8A%82%E6%B5%81/" class="iconfont icon-more">Read More</a>
-    </div> -->
-
-  </section>
-</article>
-  
-    <article class="post   animated fade-in-top">
-
-  <section class="post-header">
-    
-      <h2 class="title">
-        <a href="/2018/07/01/socket-io%E9%9B%86%E7%BE%A4%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/">
-          socket-io集群解决方案
-        </a>
-      </h2>
-      
-      <div class="subtitle">
-          <time>
-            2018年07月01日
-          </time>
-          
-      </div>
-  </section>
-  <section class="content">
-    关于socket.io的群集解决方案，官网中给出了3个示例代码。除了负载均衡的软件不同，其他的代码其实都是一样的，分别为：nginx,httpd, haproxy。以下以nginx为例说明。官网给的demo基于docker，让你可以直接运行...
-
-    <!-- <div class="readmore">
-      <a href="/2018/07/01/socket-io%E9%9B%86%E7%BE%A4%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/" class="iconfont icon-more">Read More</a>
     </div> -->
 
   </section>
