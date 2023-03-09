@@ -19,7 +19,7 @@
 <meta property="og:locale">
 <meta property="og:image" content="http://example.com/image/14.png">
 <meta property="article:published_time" content="2023-03-07T16:00:00.000Z">
-<meta property="article:modified_time" content="2023-03-08T04:33:14.497Z">
+<meta property="article:modified_time" content="2023-03-09T11:22:13.696Z">
 <meta property="article:author" content="weixiaojie">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="http://example.com/image/14.png">
@@ -224,15 +224,14 @@ spring:
     nacos:
       discovery:
         server-addr: 127.0.0.1:8001
-
     gateway:
       # 路由数组：指当请求满足什么样的断言时，转发到哪个服务上
       routes:
         # 路由标识，要求唯一，名称任意
         - id: route1
           # 请求最终被转发到的目标地址
-          #uri: http://localhost:8081
-          uri: lb://provider1
+          uri: http://localhost:8081
+          #uri: lb://provider1
           # 设置断言
           predicates:
             # Path Route Predicate Factory 断言，满足 /gateway/provider1/** 路径的请求都会被路由到 http://localhost:8081 这个uri中
@@ -241,8 +240,8 @@ spring:
           filters:
             # StripPrefix：去除原始请求路径中的前2级路径，即/gateway/provider1
             - StripPrefix=2
-            - AddRequestHeader=X-Request-red, blue
-            - My
+            #- AddRequestHeader=X-Request-red, blue
+            #- My
 
         - id: route2
           #uri: http://localhost:8082
@@ -273,31 +272,31 @@ public RouteLocator addLocator(RouteLocatorBuilder routeLocatorBuilder)&#123;
 <p><strong>Predicate (断言) (<a target="_blank" rel="noopener" href="https://docs.spring.io/spring-cloud-gateway/docs/2.2.9.RELEASE/reference/html/#gateway-request-predicates-factories">断言-官网参考文档</a>)</strong></p>
 <p>gateway内置了很多断言，篇幅限制，列出两种，源码位于：org.springframework.cloud.gateway.handler.predicate下：</p>
 <ul>
-<li><p>AfterRoutePredicateFactory</p>
-<pre><code>spring:
-cloud:
-  gateway:
-    routes:
-    - id: after_route
-      uri: http://mantou.plus  #如果请求时间在配置的时间点之后，全部转发到http://mantou.plus
-      predicates:
-      - After=2023-03-07T22:42:47.789-07:00[America/Denver]
-</code></pre>
-</li>
-<li><p>BeforeRoutePredicateFactory</p>
-<pre><code>spring:
-cloud:
-  gateway:
-    routes:
-    - id: after_route
-      uri: http://www.mantou.plus  #如果请求时间在配置的时间点之前，全部转发到http://mantou.plus
-      predicates:
-      - Before=2023-03-07T22:42:47.789-07:00[America/Denver]
-</code></pre>
-</li>
+<li>AfterRoutePredicateFactory</li>
 </ul>
+<pre><code class="yaml">spring:
+  cloud:
+    gateway:
+      routes:
+      - id: after_route
+        uri: http://mantou.plus  #如果请求时间在配置的时间点之后，全部转发到http://mantou.plus
+        predicates:
+        - After=2023-03-07T22:42:47.789-07:00[America/Denver]
+</code></pre>
+<ul>
+<li>BeforeRoutePredicateFactory</li>
+</ul>
+<pre><code class="yaml">spring:
+  cloud:
+    gateway:
+      routes:
+      - id: after_route
+        uri: http://www.mantou.plus  #如果请求时间在配置的时间点之前，全部转发到http://mantou.plus
+        predicates:
+        - Before=2023-03-07T22:42:47.789-07:00[America/Denver]
+</code></pre>
 <p><strong>过滤器 (<a target="_blank" rel="noopener" href="https://docs.spring.io/spring-cloud-gateway/docs/2.2.9.RELEASE/reference/html/#gatewayfilter-factories">过滤器-官网参考文档</a>)</strong> </p>
-<p>gateway也内置了很多过滤器，，篇幅限制，列出两种，源码位于：org.springframework.cloud.gateway.filter.factor下：</p>
+<p>gateway也内置了很多过滤器，篇幅限制，列出两种，源码位于：org.springframework.cloud.gateway.filter.factor下：</p>
 <ul>
 <li>AddRequestHeader</li>
 </ul>
@@ -324,7 +323,7 @@ cloud:
         filters:
         - StripPrefix=1
 </code></pre>
-<p>自定义过滤器：</p>
+<p><strong>自定义过滤器：</strong></p>
 <pre><code class="java">@Slf4j
 @Component
 public class MyGatewayFilterFactory extends AbstractGatewayFilterFactory &#123;
@@ -342,7 +341,17 @@ public class MyGatewayFilterFactory extends AbstractGatewayFilterFactory &#123;
     &#125;
 &#125;
 </code></pre>
-<p>GlobalFilter，无需配置，全局生效:</p>
+<p>在配置中加上我们自定义的过滤器</p>
+<pre><code class="yaml">spring:
+  cloud:
+    gateway:
+      routes:
+      - id: myfilter
+        uri: https://mantou.plus    #在请求发到目标微服务之前添加请求头和响应头
+        filters:
+        - My
+</code></pre>
+<p><strong>全局过滤器（无需配置，全局生效）</strong></p>
 <pre><code class="java">@Slf4j
 @Component
 @Order(1)
