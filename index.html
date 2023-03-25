@@ -395,7 +395,8 @@ Producer ：消息生产者，就是向 k...
       </div>
   </section>
   <section class="content">
-    
+    理解八股文，可以提高面试成功率，亦可以提高我们对底层知识的理解：
+
 redis主从、哨兵、分片集群1 
 
 redis主从、哨兵、分片集群2
@@ -404,11 +405,7 @@ redis集群gossip协议
 
 详解redis集群gossip协议
 
-Redis缓存穿透/击穿/雪崩以及数据一致性的解决方案
-
-redis看门狗机制
-
-mysql...
+Redis缓存穿透/击穿/...
 
     <!-- <div class="readmore">
       <a href="/2020/06/19/%E9%AB%98%E9%A2%91%E5%85%AB%E8%82%A1%E6%96%87/" class="iconfont icon-more">Read More</a>
@@ -441,6 +438,40 @@ mysql...
 
     <!-- <div class="readmore">
       <a href="/2020/05/26/%E8%8B%B9%E6%9E%9C%E7%99%BB%E5%BD%95%E6%9C%8D%E5%8A%A1%E7%AB%AF%E9%AA%8C%E8%AF%81/" class="iconfont icon-more">Read More</a>
+    </div> -->
+
+  </section>
+</article>
+  
+    <article class="post   animated fade-in-top">
+
+  <section class="post-header">
+    
+      <h2 class="title">
+        <a href="/2020/05/24/%E5%9F%BA%E4%BA%8ERedis%E7%9A%84%E9%99%90%E6%B5%81/">
+          基于Redis的限流
+        </a>
+      </h2>
+      
+      <div class="subtitle">
+          <time>
+            2020年05月24日
+          </time>
+          
+      </div>
+  </section>
+  <section class="content">
+    以下代码演示同一个IP在30秒内只能获取一次验证码：
+限流类型枚举
+public enum LimitType &#123;
+    //自定义限流
+    CUSTOMER,
+    //手机号限流
+    MOBILE,
+    //I...
+
+    <!-- <div class="readmore">
+      <a href="/2020/05/24/%E5%9F%BA%E4%BA%8ERedis%E7%9A%84%E9%99%90%E6%B5%81/" class="iconfont icon-more">Read More</a>
     </div> -->
 
   </section>
