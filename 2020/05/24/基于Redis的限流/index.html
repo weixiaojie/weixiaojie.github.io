@@ -18,7 +18,7 @@
 <meta property="og:description" content="以下代码演示同一个IP在30秒内只能获取一次验证码： 限流类型枚举 public enum LimitType &amp;#123;     &#x2F;&#x2F;自定义限流     CUSTOMER,     &#x2F;&#x2F;手机号限流     MOBILE,     &#x2F;&#x2F;IP限流     IP; &amp;#125;  定义限流注解 &#x2F;**  * 控制一个接口在指定时间内被访问次数限制  *&#x2F; @Target(ElementType.ME">
 <meta property="og:locale">
 <meta property="article:published_time" content="2020-05-23T16:00:00.000Z">
-<meta property="article:modified_time" content="2023-03-25T11:52:02.130Z">
+<meta property="article:modified_time" content="2023-03-25T11:58:23.011Z">
 <meta property="article:author" content="weixiaojie">
 <meta name="twitter:card" content="summary">
   
@@ -247,7 +247,7 @@ public class LimitAspect &#123;
 </ul>
 <p><strong>在接口上使用Limit注解</strong></p>
 <pre><code class="java">@GetMapping(&quot;/getCaptcha&quot;)
-@Limit(key = &quot;captcha&quot;, period = 30, count = 1, name = &quot;获取验证码&quot;, prefix = &quot;captcha&quot;, limitType = LimitType.IP)
+@Limit(key = &quot;captcha&quot;, period = 30, count = 1, name = &quot;获取验证码&quot;, prefix = &quot;limit&quot;, limitType = LimitType.IP)
 public Response getCaptcha(@NotBlank String mobile)&#123;
     //30秒内同一个IP地址只能调用一次该接口
     return new Response().code(&quot;000&quot;).data(null).message(&quot;验证码获取成功!&quot;);
