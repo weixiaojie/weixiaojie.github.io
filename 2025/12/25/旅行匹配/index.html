@@ -18,7 +18,7 @@
 <meta property="og:description" content=":root {       --primary: #4f7cff;       --primary-light: #6366f1;       --bg: #f8fafc;       --card: #ffffff;       --text: #1f2937;       --text-secondary: #6b7280;       --border: #e2e8f0;">
 <meta property="og:locale">
 <meta property="article:published_time" content="2025-12-24T16:00:00.000Z">
-<meta property="article:modified_time" content="2025-12-25T14:54:20.370Z">
+<meta property="article:modified_time" content="2025-12-25T15:05:37.222Z">
 <meta property="article:author" content="weixiaojie">
 <meta name="twitter:card" content="summary">
   
@@ -416,51 +416,6 @@
     .notification.show {
       opacity: 1;
     }
-    
-    
-    .wechat-share-guide {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0,0,0,0.8);
-      z-index: 10000;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    
-    .wechat-share-guide-content {
-      background: white;
-      padding: 20px;
-      border-radius: 12px;
-      text-align: center;
-      max-width: 80%;
-      margin: 0 auto;
-      color: #333;
-    }
-    
-    .wechat-share-guide-content p {
-      margin: 10px 0;
-    }
-    
-    .wechat-share-icon {
-      width: 60px;
-      height: 60px;
-      margin: 15px auto;
-      display: block;
-    }
-    
-    .wechat-share-guide-btn {
-      margin-top: 15px;
-      padding: 8px 16px;
-      background: var(--primary);
-      color: white;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-    }
 
     @media (max-width: 500px) {
       body {
@@ -671,24 +626,14 @@ if (!ownerParam && myPref) {
       location.reload();
     }, JSON.parse(myPref));
     
-  // 优化分享按钮功能，支持微信环境
   document.getElementById('shareBtn').onclick = () => {
-    if (isWechat()) {
-      // 微信内浏览器，显示引导分享提示
-      showWechatShareGuide();
-    } else if (navigator.share) {
-      // 支持 Web Share API
+    if (navigator.share) {
       navigator.share({
         title: '旅行搭子匹配',
         text: '快来测试一下我们是否适合一起旅行吧！',
         url: shareLink
-      }).catch(err => {
-        console.error('分享失败:', err);
-        // 如果分享失败，使用复制链接作为备选
-        copyToClipboard(shareLink);
-      });
+      }).catch(console.error);
     } else {
-      // 降级处理：复制链接
       copyToClipboard(shareLink);
     }
   };
@@ -732,34 +677,6 @@ function showNotification(message) {
   setTimeout(() => {
     notification.classList.remove('show');
   }, 2000);
-}
-
-// 检测是否在微信中
-function isWechat() {
-  return /micromessenger/i.test(navigator.userAgent);
-}
-
-// 显示微信分享引导
-function showWechatShareGuide() {
-  // 创建引导弹窗
-  let guideHtml = `
-    <div class="wechat-share-guide">
-      <div class="wechat-share-guide-content">
-        <p>点击右上角菜单</p>
-        <p>选择"分享给朋友"或"分享到朋友圈"</p>
-        <svg class="wechat-share-icon" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M19.5 15.5V20a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h13.5a1 1 0 0 1 1 1v4.25M18 12.5a6.5 6.5 0 1 0-5.207 3.293l4.793 1.918 1.918-4.793M11.5 14a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z"/>
-        </svg>
-        <button class="wechat-share-guide-btn" id="close-guide">知道了</button>
-      </div>
-    </div>
-  `;
-  
-  document.body.insertAdjacentHTML('beforeend', guideHtml);
-  
-  document.getElementById('close-guide').onclick = () => {
-    document.querySelector('.wechat-share-guide').remove();
-  };
 }
 </script>
 
