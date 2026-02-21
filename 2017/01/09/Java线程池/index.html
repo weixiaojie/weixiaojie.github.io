@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  
+  <title>Java线程池 | 超级大馒头</title>
+  <meta name="description" content="A amazing blog." />
+  <meta name="keywords" content="hexo,theme,mantou,plus" />
+  <meta name="HandheldFriendly" content="True" />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="在项目中为了提高系统性能，并发处理任务，减少线程创建的高开销，一般会用到线程池，java线程池构造如下： 通过ThreadPoolExecutor创建 public ThreadPoolExecutor(int corePoolSize,                               int maximumPoolSize,">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java线程池">
+<meta property="og:url" content="http://example.com/2017/01/09/Java%E7%BA%BF%E7%A8%8B%E6%B1%A0/index.html">
+<meta property="og:site_name" content="超级大馒头">
+<meta property="og:description" content="在项目中为了提高系统性能，并发处理任务，减少线程创建的高开销，一般会用到线程池，java线程池构造如下： 通过ThreadPoolExecutor创建 public ThreadPoolExecutor(int corePoolSize,                               int maximumPoolSize,">
+<meta property="og:locale">
+<meta property="article:published_time" content="2017-01-08T16:00:00.000Z">
+<meta property="article:modified_time" content="2023-04-03T10:56:14.000Z">
+<meta property="article:author" content="weixiaojie">
+<meta name="twitter:card" content="summary">
+  
+  
+    <link rel="icon" href="/image/favicon.ico">
+  
+
+  <link rel='stylesheet' href='/css/nprogress.css'/>
+  <link rel="stylesheet" href="/css/github-gist.min.css">
+  <link rel="stylesheet" href="/css/font_405585_yuudmyqpo3q.css">
+  <script src='/js/nprogress.min.js'></script>
+  <!-- <script>try{Typekit.load({ async: false });}catch(e){}</script> -->
+  
+<link rel="stylesheet" href="/style.css">
+
+  
+
+  
+
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+<body>
+  
+  <script>NProgress.start();</script>
+  
+  <div id="site-wrapper">
+    
+    <header class="header">
+  <div class="header-wrapper">
+    <a href="/">
+      <img src="/image/logo.jpg" class="logo"/>
+      <!-- <span class="site-desc">
+        
+      </span> -->
+    </a>
+    <div class="social-wrapper">
+      
+        
+          <a href="https://github.com/weixiaojie" class="social github" target="_blank" rel="external">
+            <span class="iconfont icon-github"></span>
+          </a>
+          
+          <a href="https://weibo.com/u/2156965395" class="social weibo" target="_blank" rel="external">
+            <span class="iconfont icon-weibo"></span>
+          </a>
+          
+          <a href="mailto:18565765503@163.com" class="social email" target="_blank" rel="external">
+            <span class="iconfont icon-email"></span>
+          </a>
+          
+      
+      
+      <a href="#" class="social search-do" target="_blank" rel="external">
+        <span class="iconfont icon-search"></span>
+      </a>
+            
+      <!-- <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><input type="hidden" name="sitesearch" value="http://example.com"></form> -->
+    </div>
+    <div class="search-wrap">
+      <div class="search-content animated fade-in">
+        <p class="search-input">
+          <span class="iconfont icon-search"></span>
+          <input tabindex="1">
+        </p>
+        <ul class="search-result">
+            
+        </ul>
+      </div>
+    </div>
+    <nav class="header-nav">
+      
+        <a href="/" class="archives">
+          首页
+        </a>
+        
+        <a href="/archives" class="archives">
+          归档
+        </a>
+        
+    </nav>
+  </div>
+</header>
+    <script>NProgress.set(0.4);</script>
+    
+    <main id="main" role="main">
+      <article id="post-Java线程池"
+  class="post article white-box article-type-post animated fade-in-top"
+  itemscope itemprop="blogPost">
+  <section class="post-header article-header">
+    <h2 class="title">
+        <a href="/2017/01/09/Java%E7%BA%BF%E7%A8%8B%E6%B1%A0/">
+          Java线程池
+        </a>
+      </h2>
+      <div class="subtitle">
+          <time>
+            2017年01月09日
+          </time>
+          
+      </div>
+  </section>
+  <section class="content">
+    <div class="article-entry" itemprop="articleBody">
+      <p>在项目中为了提高系统性能，并发处理任务，减少线程创建的高开销，一般会用到线程池，java线程池构造如下：</p>
+<p><strong>通过ThreadPoolExecutor创建</strong></p>
+<pre><code>public ThreadPoolExecutor(int corePoolSize,
+                              int maximumPoolSize,
+                              long keepAliveTime,
+                              TimeUnit unit,
+                              BlockingQueue&lt;Runnable&gt; workQueue,
+                              ThreadFactory threadFactory,
+                              RejectedExecutionHandler handler) &#123;
+        if (corePoolSize &lt; 0 ||
+            maximumPoolSize &lt;= 0 ||
+            maximumPoolSize &lt; corePoolSize ||
+            keepAliveTime &lt; 0)
+            throw new IllegalArgumentException();
+        if (workQueue == null || threadFactory == null || handler == null)
+            throw new NullPointerException();
+        this.corePoolSize = corePoolSize;
+        this.maximumPoolSize = maximumPoolSize;
+        this.workQueue = workQueue;
+        this.keepAliveTime = unit.toNanos(keepAliveTime);
+        this.threadFactory = threadFactory;
+        this.handler = handler;
+    &#125;
+</code></pre>
+<p><strong>参数含义</strong></p>
+<ul>
+<li>corePoolSize： 线程池核心线程数最大值</li>
+<li>maximumPoolSize： 线程池最大线程数大小</li>
+<li>keepAliveTime： 线程池中非核心线程空闲的存活时间大小</li>
+<li>unit： 线程空闲存活时间单位</li>
+<li>workQueue： 存放任务的阻塞队列</li>
+<li>threadFactory： 用于设置创建线程的工厂，可以给创建的线程设置有意义的名字，可方便排查问题。</li>
+<li>handler：  线城池的饱和策略事件，主要有四种类型。</li>
+</ul>
+<p><strong>运行流程</strong></p>
+<ul>
+<li>提交一个任务，线程池里存活的核心线程数小于线程数corePoolSize时，线程池会创建一个核心线程去处理提交的任务。</li>
+<li>如果线程池核心线程数已满，即线程数已经等于corePoolSize，一个新提交的任务，会被放进任务队列workQueue排队等待执行。</li>
+<li>当线程池里面存活的线程数已经等于corePoolSize了,并且任务队列workQueue也满，判断线程数是否达到maximumPoolSize，即最大线程数是否已满，如果没到达，创建一个非核心线程执行提交的任务。</li>
+<li>如果当前的线程数达到了maximumPoolSize，还有新的任务过来的话，直接采用拒绝策略处理。</li>
+</ul>
+<p><strong>工作队列</strong></p>
+<ul>
+<li><p>ArrayBlockingQueue：ArrayBlockingQueue（有界队列）是一个用数组实现的有界阻塞队列，按FIFO排序量。插入和删除数据，只采用了一个 lock，并发效率略低于LinkedBlockingQueue。</p>
+</li>
+<li><p>LinkedBlockingQueue：LinkedBlockingQueue（可设置容量队列）基于链表结构的阻塞队列，按FIFO排序任务，容量可以选择进行设置，不设置的话，将是一个无边界的阻塞队列，最大长度为Integer.MAX_VALUE，插入和删除分别采用了putLock和takeLock，这样可以降低线程由于无法获取到 lock 而进入 WAITING 状态的可能性，从而提高了线程并发执行的效率。吞吐量通常要高于ArrayBlockingQuene；newFixedThreadPool线程池使用了这个队列。</p>
+</li>
+<li><p>DelayQueue：DelayQueue（延迟队列）是一个任务定时周期的延迟执行的队列。根据指定的执行时间从小到大排序，否则根据插入到队列的先后排序。newScheduledThreadPool线程池使用了这个队列</p>
+</li>
+<li><p>PriorityBlockingQueue：PriorityBlockingQueue（优先级队列）是具有优先级的无界阻塞队列；</p>
+</li>
+<li><p>SynchronousQueue：SynchronousQueue（同步队列）一个不存储元素的阻塞队列，每个插入操作必须等到另一个线程调用移除操作，否则插入操作一直处于阻塞状态，newCachedThreadPool线程池使用了这个队列。</p>
+</li>
+</ul>
+<p><strong>拒绝策略</strong></p>
+<ul>
+<li><p>AbortPolicy：中止策略，线程池默认的拒绝策略，也是我们最常用的拒绝策略。当线程池满载的时候，丢弃任务，并抛出RejectedExecutionException 异常信息。</p>
+</li>
+<li><p>DiscardPolicy：丢弃策略，一般我们都不会选择它，因为它直接就把任务丢弃掉了，我们毫无感知。如果任务不重要，丢弃掉也没有没关系，就可以使用它。</p>
+</li>
+<li><p>DiscardOldestPolicy：丢弃阻塞队列 workQueue 中最老的一个任务，并将新任务加入</p>
+</li>
+<li><p>CallerRunsPolicy：交给线程池调用所在的线程进行处理。</p>
+</li>
+</ul>
+<p><strong>通过Executors创建</strong></p>
+<ul>
+<li><p>newFixedThreadPool：固定数目线程的线程池，核心线程数和最大线程数大小一样，没有所谓的非空闲时间，即keepAliveTime为0，阻塞队列为无界队列LinkedBlockingQueue。newFixedThreadPool使用了无界的阻塞队列LinkedBlockingQueue，如果线程获取一个任务后，任务的执行时间比较长(比如，上面demo设置了10秒)，会导致队列的任务越积越多，导致机器内存使用不停飙升， 最终导致OOM。FixedThreadPool 适用于处理CPU密集型的任务，确保CPU在长期被工作线程使用的情况下，尽可能的少的分配线程，即适用执行长期的任务。</p>
+</li>
+<li><p>newCachedThreadPool：可缓存线程的线程池，核心线程数为0，最大线程数为Integer.MAX_VALUE，阻塞队列是SynchronousQueue，非核心线程空闲存活时间为60秒。当提交任务的速度大于处理任务的速度时，每次提交一个任务，就必然会创建一个线程。极端情况下会创建过多的线程，耗尽 CPU 和内存资源。由于空闲 60 秒的线程会被终止，长时间保持空闲的 CachedThreadPool 不会占用任何资源。</p>
+</li>
+</ul>
+<ul>
+<li><p>newSingleThreadExecutor：单线程的线程池，核心线程数为1，最大线程数也为1，阻塞队列是LinkedBlockingQueue，keepAliveTime为0，适用于串行执行任务的场景，一个任务一个任务地执行。</p>
+</li>
+<li><p>newScheduledThreadPool：定时及周期执行的线程池，最大线程数为Integer.MAX_VALUE，阻塞队列是DelayedWorkQueue，keepAliveTime为0，scheduleAtFixedRate() ：按某种速率周期执行，scheduleWithFixedDelay()：在某个延迟后执行。适用于周期性执行任务的场景，需要限制线程数量的场景。</p>
+</li>
+</ul>
+<ul>
+<li>newWorkStealingPool(java8新增)：基于ForkJoinPool，使用所有可用处理器作为目标并行度，创建一个窃取线程的池。如果一个线程完成了工作并且无事可做，则可以从另一线程的队列中”窃取”工作，适合于大型计算递归任务。</li>
+</ul>
+
+    </div>
+  </section>
+
+  
+  
+</article>
+      <script>NProgress.set(0.6);</script>
+    </main>
+    
+    <!-- <footer class="footer">
+  <div class="footer-wrap">
+    <div class="footer-link">
+      
+      <h3>LINKS</h3>
+      <p>
+        
+          <a href="http://1x0.xyz/" target="_blank">Tian1x0</a>
+        
+          <a href="http://www.royalmice.com/hankzhou/" target="_blank">Hankzhou</a>
+        
+          <a href="http://sjydh.me/" target="_blank">设计有点货</a>
+        
+          <a href="https://developers.google.com/web/fundamentals/" target="_blank">Web fundamentals</a>
+        
+      </p>
+      
+    </div>
+    <div class="footer-tags">
+      
+    </div>
+    <div class="footer-info">
+        <div>Theme <span class="codename"><a href="https://github.com/GGICE/hexo-icer" target="_blank">icer</a></span> designed & coded by <a href="https://ice.gs/" target="_blank">GGICE</a></div>
+        <div>Copyright &copy; 2026, <a href="/">超级大馒头</a>  . All rights reserved .</div>
+      </div>
+  </div>
+</footer>
+ -->
+
+    <script>NProgress.set(0.8);</script>
+    
+  </div>
+
+  <script src="/js/highlight.min.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+
+<script src="/js/main.js"></script>
+
+
+<!-- Commit -->
+
+
+
+  <script>
+    NProgress.done();
+  </script>
+  
+</body>
+</html>

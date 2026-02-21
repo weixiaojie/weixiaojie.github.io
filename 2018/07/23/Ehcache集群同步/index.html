@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  
+  <title>Ehcache集群同步 | 超级大馒头</title>
+  <meta name="description" content="A amazing blog." />
+  <meta name="keywords" content="hexo,theme,mantou,plus" />
+  <meta name="HandheldFriendly" content="True" />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="Ehcache 是一个用Java编写的缓存框架，可以直接集成到Java项目中，与Redis，Memcache等需要另外搭建服务的缓存框架相比，更加轻量，适合集群节点较少的中小型项目。 目前Ehcache主流的集群解决方案主要有RMI与JGROUPS。  RMI  基于JAVA JDK的RMI远程访问技术，无需引入第三方依赖，集群配置相对复杂  JGROPUPS  开源的纯JAVA编写的可靠的群组通">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Ehcache集群同步">
+<meta property="og:url" content="http://example.com/2018/07/23/Ehcache%E9%9B%86%E7%BE%A4%E5%90%8C%E6%AD%A5/index.html">
+<meta property="og:site_name" content="超级大馒头">
+<meta property="og:description" content="Ehcache 是一个用Java编写的缓存框架，可以直接集成到Java项目中，与Redis，Memcache等需要另外搭建服务的缓存框架相比，更加轻量，适合集群节点较少的中小型项目。 目前Ehcache主流的集群解决方案主要有RMI与JGROUPS。  RMI  基于JAVA JDK的RMI远程访问技术，无需引入第三方依赖，集群配置相对复杂  JGROPUPS  开源的纯JAVA编写的可靠的群组通">
+<meta property="og:locale">
+<meta property="article:published_time" content="2018-07-22T16:00:00.000Z">
+<meta property="article:modified_time" content="2023-02-11T16:14:32.000Z">
+<meta property="article:author" content="weixiaojie">
+<meta name="twitter:card" content="summary">
+  
+  
+    <link rel="icon" href="/image/favicon.ico">
+  
+
+  <link rel='stylesheet' href='/css/nprogress.css'/>
+  <link rel="stylesheet" href="/css/github-gist.min.css">
+  <link rel="stylesheet" href="/css/font_405585_yuudmyqpo3q.css">
+  <script src='/js/nprogress.min.js'></script>
+  <!-- <script>try{Typekit.load({ async: false });}catch(e){}</script> -->
+  
+<link rel="stylesheet" href="/style.css">
+
+  
+
+  
+
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+<body>
+  
+  <script>NProgress.start();</script>
+  
+  <div id="site-wrapper">
+    
+    <header class="header">
+  <div class="header-wrapper">
+    <a href="/">
+      <img src="/image/logo.jpg" class="logo"/>
+      <!-- <span class="site-desc">
+        
+      </span> -->
+    </a>
+    <div class="social-wrapper">
+      
+        
+          <a href="https://github.com/weixiaojie" class="social github" target="_blank" rel="external">
+            <span class="iconfont icon-github"></span>
+          </a>
+          
+          <a href="https://weibo.com/u/2156965395" class="social weibo" target="_blank" rel="external">
+            <span class="iconfont icon-weibo"></span>
+          </a>
+          
+          <a href="mailto:18565765503@163.com" class="social email" target="_blank" rel="external">
+            <span class="iconfont icon-email"></span>
+          </a>
+          
+      
+      
+      <a href="#" class="social search-do" target="_blank" rel="external">
+        <span class="iconfont icon-search"></span>
+      </a>
+            
+      <!-- <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><input type="hidden" name="sitesearch" value="http://example.com"></form> -->
+    </div>
+    <div class="search-wrap">
+      <div class="search-content animated fade-in">
+        <p class="search-input">
+          <span class="iconfont icon-search"></span>
+          <input tabindex="1">
+        </p>
+        <ul class="search-result">
+            
+        </ul>
+      </div>
+    </div>
+    <nav class="header-nav">
+      
+        <a href="/" class="archives">
+          首页
+        </a>
+        
+        <a href="/archives" class="archives">
+          归档
+        </a>
+        
+    </nav>
+  </div>
+</header>
+    <script>NProgress.set(0.4);</script>
+    
+    <main id="main" role="main">
+      <article id="post-Ehcache集群同步"
+  class="post article white-box article-type-post animated fade-in-top"
+  itemscope itemprop="blogPost">
+  <section class="post-header article-header">
+    <h2 class="title">
+        <a href="/2018/07/23/Ehcache%E9%9B%86%E7%BE%A4%E5%90%8C%E6%AD%A5/">
+          Ehcache集群同步
+        </a>
+      </h2>
+      <div class="subtitle">
+          <time>
+            2018年07月23日
+          </time>
+          
+      </div>
+  </section>
+  <section class="content">
+    <div class="article-entry" itemprop="articleBody">
+      <p>Ehcache 是一个用Java编写的缓存框架，可以直接集成到Java项目中，与Redis，Memcache等需要另外搭建服务的缓存框架相比，更加轻量，适合集群节点较少的中小型项目。</p>
+<p>目前Ehcache主流的集群解决方案主要有<code>RMI</code>与<code>JGROUPS</code>。</p>
+<ul>
+<li><p><code>RMI  基于JAVA JDK的RMI远程访问技术，无需引入第三方依赖，集群配置相对复杂</code></p>
+</li>
+<li><p><code>JGROPUPS  开源的纯JAVA编写的可靠的群组通讯工具，需要第三方jar包依赖，集群配置简单</code></p>
+</li>
+</ul>
+<p>假设集群中有A，B两台服务器，ip分别为<code>192.168.1.1</code>和<code>192.168.1.2</code></p>
+<h3 id="服务器A-put值"><a href="#服务器A-put值" class="headerlink" title="服务器A  put值"></a>服务器A  put值</h3><pre><code>public class Ehcache1 &#123;
+    public static void main(String[] args) &#123;
+        System.setProperty(&quot;java.net.preferIPv4Stack&quot;, &quot;true&quot;);
+        System.setProperty(&quot;java.net.preferIPv6Addresses&quot;, &quot;true&quot;);
+        URL url = Ehcache1.class.getClassLoader().getResource(&quot;ehcache.xml&quot;);
+        CacheManager manager = new CacheManager(url);
+        final Cache cache = manager.getCache(&quot;userCache&quot;);
+        ScheduledExecutorService scheduledThreadPool = Executors.newScheduledThreadPool(1);
+        scheduledThreadPool.scheduleAtFixedRate(new Runnable() &#123;
+            private final AtomicLong acl = new AtomicLong(1);
+            @Override
+            public void run() &#123;
+                long value = acl.getAndIncrement();
+                System.out.println(&quot;正在put,value值:&quot; + value);
+                cache.put(new Element(&quot;key&quot;, value));
+            &#125;
+        &#125;, 1, 1, TimeUnit.SECONDS);
+    &#125;
+&#125;
+</code></pre>
+<p>服务器A的代码为每隔一秒更新key值累加1</p>
+<h3 id="服务器B-get值"><a href="#服务器B-get值" class="headerlink" title="服务器B  get值"></a>服务器B  get值</h3><pre><code>public class Ehcache2 &#123;
+    public static void main(String[] args) &#123;
+        System.setProperty(&quot;java.net.preferIPv4Stack&quot;, &quot;true&quot;);
+        System.setProperty(&quot;java.net.preferIPv6Addresses&quot;, &quot;true&quot;);
+        URL url = Ehcache2.class.getClassLoader().getResource(&quot;ehcache.xml&quot;);
+        CacheManager manager = new CacheManager(url);
+        final Cache cache = manager.getCache(&quot;userCache&quot;);
+        ScheduledExecutorService scheduledThreadPool = Executors.newScheduledThreadPool(1);
+        scheduledThreadPool.scheduleAtFixedRate(new Runnable() &#123;
+            @Override
+            public void run() &#123;
+                System.out.println(&quot;正在获取value:&quot;);
+                Element element = cache.get(&quot;key&quot;);
+                if(element!=null)&#123;
+                    System.out.println(element.getObjectValue());
+                &#125;
+            &#125;
+        &#125;, 1, 1, TimeUnit.SECONDS);
+    &#125;
+&#125;
+</code></pre>
+<p>服务器B的代码为每隔一秒获取key的值</p>
+<p>如果集群同步成功，那么B服务器就能get到A服务器put的值</p>
+<p>RMI和JGROPUPS这两种方案，都分别有<code>自动发现</code>和<code>手动配置</code>两种模式。自动发现模式下，各个节点会自动去寻找局域网中同网段的节点，每个节点的配置都一样。而手动配置则根据配置文件中的IP去寻找对应的集群节点，每个节点的配置都不同。</p>
+<h3 id="RMI-自动发现"><a href="#RMI-自动发现" class="headerlink" title="RMI  自动发现"></a>RMI  自动发现</h3><pre><code>&lt;ehcache&gt;
+    &lt;cacheManagerPeerProviderFactory
+        class=&quot;net.sf.ehcache.distribution.RMICacheManagerPeerProviderFactory&quot;
+        properties=&quot;peerDiscovery=automatic, 
+                    multicastGroupAddress=230.0.0.1,
+                    multicastGroupPort=4446, 
+                    timeToLive=32&quot; /&gt;
+    &lt;cacheManagerPeerListenerFactory
+        class=&quot;net.sf.ehcache.distribution.RMICacheManagerPeerListenerFactory&quot; /&gt;
+    &lt;cache name=&quot;userCache&quot; maxElementsInMemory=&quot;10&quot;&gt;
+        &lt;cacheEventListenerFactory
+            class=&quot;net.sf.ehcache.distribution.RMICacheReplicatorFactory&quot;
+            properties=&quot;replicateAsynchronously=true, 
+                        replicatePuts=true, 
+                        replicateUpdates=true,
+                        replicateUpdatesViaCopy=true, 
+                        replicateRemovals=true&quot; /&gt;
+        &lt;bootstrapCacheLoaderFactory
+            class=&quot;net.sf.ehcache.distribution.RMIBootstrapCacheLoaderFactory&quot;
+            properties=&quot;bootstrapAsynchronously=true&quot; /&gt;
+    &lt;/cache&gt;
+&lt;/ehcache&gt;
+</code></pre>
+<p>其中<code>multicastGroupAddress</code>为组播地址，可以指定 D 类 IP 地址空间，范围从 <code>224.0.1.0 </code>到 <code>238.255.255.255</code> 中的任何一个地址。自动发现的方式，每个服务器上的配置文件都是一样的，集群中有新增节点或者删除节点的时候，无需改动配置文件。</p>
+<h3 id="RMI-手动配置-A节点"><a href="#RMI-手动配置-A节点" class="headerlink" title="RMI  手动配置 A节点"></a>RMI  手动配置 A节点</h3><pre><code>&lt;ehcache&gt;
+    &lt;cacheManagerPeerProviderFactory 
+        class=&quot;net.sf.ehcache.distribution.RMICacheManagerPeerProviderFactory&quot;
+        properties=&quot;peerDiscovery=manual,rmiUrls=//192.168.1.2:1000/userCache&quot; /&gt;
+    &lt;cacheManagerPeerListenerFactory 
+        class=&quot;net.sf.ehcache.distribution.RMICacheManagerPeerListenerFactory&quot;
+        properties=&quot;hostName=192.168.1.1,port=1000,socketTimeoutMillis=2000&quot; /&gt;
+    &lt;cache name=&quot;userCache&quot; maxElementsInMemory=&quot;10&quot;&gt;
+        &lt;cacheEventListenerFactory
+            class=&quot;net.sf.ehcache.distribution.RMICacheReplicatorFactory&quot;
+            properties=&quot;replicateAsynchronously=true, 
+                        replicatePuts=true, 
+                        replicateUpdates=true,
+                        replicateUpdatesViaCopy=true, 
+                        replicateRemovals=true&quot; /&gt;
+        &lt;bootstrapCacheLoaderFactory
+            class=&quot;net.sf.ehcache.distribution.RMIBootstrapCacheLoaderFactory&quot;
+            properties=&quot;bootstrapAsynchronously=true&quot; /&gt;
+    &lt;/cache&gt;
+&lt;/ehcache&gt;
+</code></pre>
+<p>其中<code>rmiUrls </code>中配置其他节点的地址和cache名称，多个节点的时候用<code>||</code>分割:</p>
+<pre><code>rmiUrls=//192.168.1.2:1000/userCache||//192.168.1.3:1000/userCache
+</code></pre>
+<p><code>cacheManagerPeerListenerFactory </code>中配置当前节点的ip和port，不能省略。节点B的配置，只要修改IP即可,其他配置一样：</p>
+<pre><code> &lt;cacheManagerPeerProviderFactory 
+        class=&quot;net.sf.ehcache.distribution.RMICacheManagerPeerProviderFactory&quot;
+        properties=&quot;peerDiscovery=manual,rmiUrls=//192.168.1.1:1000/userCache&quot; /&gt;
+ &lt;cacheManagerPeerListenerFactory 
+        class=&quot;net.sf.ehcache.distribution.RMICacheManagerPeerListenerFactory&quot;
+        properties=&quot;hostName=192.168.1.2,port=1000,socketTimeoutMillis=2000&quot; /&gt;
+</code></pre>
+<p>手动配置的方式，每个节点的配置都不一样，而且当集群中增加或者删除节点的时候，需要修改配置，较为复杂。不过自动发现的方式在多网卡多IP，虚拟机，禁止组播等环境限制下将会无法使用。</p>
+<h3 id="pom-加载-JGROUPS-依赖"><a href="#pom-加载-JGROUPS-依赖" class="headerlink" title="pom 加载 JGROUPS 依赖"></a>pom 加载 JGROUPS 依赖</h3><pre><code>&lt;dependency&gt;
+    &lt;groupId&gt;org.jgroups&lt;/groupId&gt;
+    &lt;artifactId&gt;jgroups&lt;/artifactId&gt;
+    &lt;version&gt;3.6.9.Final&lt;/version&gt;
+&lt;/dependency&gt;
+
+&lt;dependency&gt;
+    &lt;groupId&gt;net.sf.ehcache&lt;/groupId&gt;
+    &lt;artifactId&gt;ehcache-jgroupsreplication&lt;/artifactId&gt;
+    &lt;version&gt;1.7&lt;/version&gt;
+&lt;/dependency&gt;
+</code></pre>
+<h3 id="JGROUPS-自动发现"><a href="#JGROUPS-自动发现" class="headerlink" title="JGROUPS  自动发现"></a>JGROUPS  自动发现</h3><pre><code>&lt;ehcache&gt;
+    &lt;cacheManagerPeerProviderFactory
+        class=&quot;net.sf.ehcache.distribution.jgroups.JGroupsCacheManagerPeerProviderFactory&quot;
+        properties=&quot;connect=UDP(mcast_addr=231.12.21.132;mcast_port=45566;)&quot;
+        propertySeparator=&quot;::&quot; /&gt;
+    &lt;cache name=&quot;userCache&quot; maxElementsInMemory=&quot;10000&quot;&gt;
+        &lt;cacheEventListenerFactory
+            class=&quot;net.sf.ehcache.distribution.jgroups.JGroupsCacheReplicatorFactory&quot;
+            properties=&quot;replicateAsynchronously=true,
+                        replicatePuts=true,
+                        replicateUpdates=true,
+                        replicateUpdatesViaCopy=true,
+                        replicateRemovals=true&quot; /&gt;
+        &lt;bootstrapCacheLoaderFactory
+            class=&quot;net.sf.ehcache.distribution.jgroups.JGroupsBootstrapCacheLoaderFactory&quot;
+            properties=&quot;bootstrapAsynchronously=true&quot; /&gt;
+    &lt;/cache&gt;
+&lt;/ehcache&gt;
+</code></pre>
+<p>JGROUPS自动发现，采用UDP广播，所有节点的配置均一样。</p>
+<h3 id="JGROUPS-手动配置-A节点"><a href="#JGROUPS-手动配置-A节点" class="headerlink" title="JGROUPS  手动配置 A节点"></a>JGROUPS  手动配置 A节点</h3><pre><code>&lt;ehcache&gt;
+    &lt;cacheManagerPeerProviderFactory
+        class=&quot;net.sf.ehcache.distribution.jgroups.JGroupsCacheManagerPeerProviderFactory&quot;
+        properties=&quot;connect=TCP(bind_addr=192.168.1.1;bind_port=1000):
+            TCPPING(initial_hosts=192.168.1.1[1000],192.168.1.2[1000];port_range=1;timeout=5000;num_initial_members=2):
+            MERGE2(min_interval=3000;max_interval=5000):
+            FD_ALL(interval=5000;timeout=20000):
+            FD(timeout=5000;max_tries=48;):
+            VERIFY_SUSPECT(timeout=1500):
+            pbcast.NAKACK(retransmit_timeout=100,200,300,600,1200,2400,4800;discard_delivered_msgs=true):
+            pbcast.STABLE(stability_delay=1000;desired_avg_gossip=20000;max_bytes=0):
+            pbcast.GMS(print_local_addr=true;join_timeout=5000)&quot;
+        propertySeparator=&quot;::&quot; /&gt;
+    &lt;cache name=&quot;userCache&quot; maxElementsInMemory=&quot;10000&quot;&gt;
+        &lt;cacheEventListenerFactory
+            class=&quot;net.sf.ehcache.distribution.jgroups.JGroupsCacheReplicatorFactory&quot;
+            properties=&quot;replicateAsynchronously=true,
+                        replicatePuts=true,
+                        replicateUpdates=true,
+                        replicateUpdatesViaCopy=true,
+                        replicateRemovals=true&quot; /&gt;
+        &lt;bootstrapCacheLoaderFactory
+            class=&quot;net.sf.ehcache.distribution.jgroups.JGroupsBootstrapCacheLoaderFactory&quot;
+            properties=&quot;bootstrapAsynchronously=true&quot; /&gt;
+    &lt;/cache&gt;
+&lt;/ehcache&gt;
+</code></pre>
+<p>其中<code>TCPPING(initial_hosts)</code>配置所有节点的<code>ip</code>和<code>port</code>信息。每个节点的<code>bind_addr</code>和<code>bind_port</code><br>需要配置本节点的<code>ip</code>和<code>port</code>信息，其他配置均一样。另外<code>bind_addr</code>和<code>bind_port</code>配置不能省略，否则有可能导致同步失败。</p>
+<p>B节点中的配置只需要将ip改为如下即可：</p>
+<pre><code>&quot;connect=TCP(bind_addr=192.168.1.2;bind_port=1000)&quot;
+</code></pre>
+
+    </div>
+  </section>
+
+  
+  
+</article>
+      <script>NProgress.set(0.6);</script>
+    </main>
+    
+    <!-- <footer class="footer">
+  <div class="footer-wrap">
+    <div class="footer-link">
+      
+      <h3>LINKS</h3>
+      <p>
+        
+          <a href="http://1x0.xyz/" target="_blank">Tian1x0</a>
+        
+          <a href="http://www.royalmice.com/hankzhou/" target="_blank">Hankzhou</a>
+        
+          <a href="http://sjydh.me/" target="_blank">设计有点货</a>
+        
+          <a href="https://developers.google.com/web/fundamentals/" target="_blank">Web fundamentals</a>
+        
+      </p>
+      
+    </div>
+    <div class="footer-tags">
+      
+    </div>
+    <div class="footer-info">
+        <div>Theme <span class="codename"><a href="https://github.com/GGICE/hexo-icer" target="_blank">icer</a></span> designed & coded by <a href="https://ice.gs/" target="_blank">GGICE</a></div>
+        <div>Copyright &copy; 2026, <a href="/">超级大馒头</a>  . All rights reserved .</div>
+      </div>
+  </div>
+</footer>
+ -->
+
+    <script>NProgress.set(0.8);</script>
+    
+  </div>
+
+  <script src="/js/highlight.min.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+
+<script src="/js/main.js"></script>
+
+
+<!-- Commit -->
+
+
+
+  <script>
+    NProgress.done();
+  </script>
+  
+</body>
+</html>

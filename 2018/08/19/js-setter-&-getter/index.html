@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  
+  <title>js-setter-&amp;-getter | 超级大馒头</title>
+  <meta name="description" content="A amazing blog." />
+  <meta name="keywords" content="hexo,theme,mantou,plus" />
+  <meta name="HandheldFriendly" content="True" />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="在mvvm框架中，数据双向绑定的底层实现中会用到setter和getter，javascript的中的setter和getter可以实现：  当获取对象的属性值时可以触发get方法 当为对象的属性赋值时可以触发set方法  主要有如下4种实现方式： 对象初始化时定义var obj &#x3D; &amp;#123;     a: 1,     get b() &amp;#123;         return this.a">
+<meta property="og:type" content="article">
+<meta property="og:title" content="js-setter-&amp;-getter">
+<meta property="og:url" content="http://example.com/2018/08/19/js-setter-&-getter/index.html">
+<meta property="og:site_name" content="超级大馒头">
+<meta property="og:description" content="在mvvm框架中，数据双向绑定的底层实现中会用到setter和getter，javascript的中的setter和getter可以实现：  当获取对象的属性值时可以触发get方法 当为对象的属性赋值时可以触发set方法  主要有如下4种实现方式： 对象初始化时定义var obj &#x3D; &amp;#123;     a: 1,     get b() &amp;#123;         return this.a">
+<meta property="og:locale">
+<meta property="article:published_time" content="2018-08-18T16:00:00.000Z">
+<meta property="article:modified_time" content="2023-02-11T16:14:32.000Z">
+<meta property="article:author" content="weixiaojie">
+<meta name="twitter:card" content="summary">
+  
+  
+    <link rel="icon" href="/image/favicon.ico">
+  
+
+  <link rel='stylesheet' href='/css/nprogress.css'/>
+  <link rel="stylesheet" href="/css/github-gist.min.css">
+  <link rel="stylesheet" href="/css/font_405585_yuudmyqpo3q.css">
+  <script src='/js/nprogress.min.js'></script>
+  <!-- <script>try{Typekit.load({ async: false });}catch(e){}</script> -->
+  
+<link rel="stylesheet" href="/style.css">
+
+  
+
+  
+
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+<body>
+  
+  <script>NProgress.start();</script>
+  
+  <div id="site-wrapper">
+    
+    <header class="header">
+  <div class="header-wrapper">
+    <a href="/">
+      <img src="/image/logo.jpg" class="logo"/>
+      <!-- <span class="site-desc">
+        
+      </span> -->
+    </a>
+    <div class="social-wrapper">
+      
+        
+          <a href="https://github.com/weixiaojie" class="social github" target="_blank" rel="external">
+            <span class="iconfont icon-github"></span>
+          </a>
+          
+          <a href="https://weibo.com/u/2156965395" class="social weibo" target="_blank" rel="external">
+            <span class="iconfont icon-weibo"></span>
+          </a>
+          
+          <a href="mailto:18565765503@163.com" class="social email" target="_blank" rel="external">
+            <span class="iconfont icon-email"></span>
+          </a>
+          
+      
+      
+      <a href="#" class="social search-do" target="_blank" rel="external">
+        <span class="iconfont icon-search"></span>
+      </a>
+            
+      <!-- <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><input type="hidden" name="sitesearch" value="http://example.com"></form> -->
+    </div>
+    <div class="search-wrap">
+      <div class="search-content animated fade-in">
+        <p class="search-input">
+          <span class="iconfont icon-search"></span>
+          <input tabindex="1">
+        </p>
+        <ul class="search-result">
+            
+        </ul>
+      </div>
+    </div>
+    <nav class="header-nav">
+      
+        <a href="/" class="archives">
+          首页
+        </a>
+        
+        <a href="/archives" class="archives">
+          归档
+        </a>
+        
+    </nav>
+  </div>
+</header>
+    <script>NProgress.set(0.4);</script>
+    
+    <main id="main" role="main">
+      <article id="post-js-setter-&amp;-getter"
+  class="post article white-box article-type-post animated fade-in-top"
+  itemscope itemprop="blogPost">
+  <section class="post-header article-header">
+    <h2 class="title">
+        <a href="/2018/08/19/js-setter-&-getter/">
+          js-setter-&amp;-getter
+        </a>
+      </h2>
+      <div class="subtitle">
+          <time>
+            2018年08月19日
+          </time>
+          
+      </div>
+  </section>
+  <section class="content">
+    <div class="article-entry" itemprop="articleBody">
+      <p>在mvvm框架中，数据双向绑定的底层实现中会用到setter和getter，javascript的中的setter和getter可以实现：</p>
+<ul>
+<li>当获取对象的属性值时可以触发<code>get</code>方法</li>
+<li>当为对象的属性赋值时可以触发<code>set</code>方法</li>
+</ul>
+<p>主要有如下4种实现方式：</p>
+<h3 id="对象初始化时定义"><a href="#对象初始化时定义" class="headerlink" title="对象初始化时定义"></a><code>对象初始化时定义</code></h3><pre><code class="javascript">var obj = &#123;
+    a: 1,
+    get b() &#123;
+        return this.a;
+    &#125;,
+    set b(v) &#123;
+        this.a = v;
+    &#125;
+&#125;;
+console.log(obj.b);
+obj.b = 2;
+console.log(obj.b);
+</code></pre>
+<h3 id="Object-create"><a href="#Object-create" class="headerlink" title="Object.create"></a><code>Object.create</code></h3><pre><code>var proto = &#123;a : 1&#125;;
+var obj = Object.create(proto, &#123;
+    b: &#123;
+        get: function () &#123;
+            return this.a;
+        &#125;,
+        set: function (v) &#123;
+            this.a = v;
+        &#125;
+    &#125;
+&#125;);
+console.log(obj.b);
+obj.b = 2;
+console.log(obj.b);
+</code></pre>
+<h3 id="Object-prototype-defineGetter-非标准-amp-amp-Object-prototype-defineSetter-非标准"><a href="#Object-prototype-defineGetter-非标准-amp-amp-Object-prototype-defineSetter-非标准" class="headerlink" title="Object.prototype.__defineGetter__(非标准)  &amp;&amp;   Object.prototype.__defineSetter__(非标准)"></a><code>Object.prototype.__defineGetter__(非标准)</code>  &amp;&amp;   <code>Object.prototype.__defineSetter__(非标准)</code></h3><pre><code>var obj = &#123; a: 1 &#125;;
+obj.__defineGetter__(&quot;b&quot;, function () &#123;
+    return this.a;
+&#125;);
+obj.__defineSetter__(&quot;b&quot;, function (v) &#123;
+    this.a = v;
+&#125;)
+console.log(obj.b);
+obj.b = 2;
+console.log(obj.b);
+</code></pre>
+<h3 id="Object-defineProperty"><a href="#Object-defineProperty" class="headerlink" title="Object.defineProperty"></a><code>Object.defineProperty</code></h3><pre><code>var obj = &#123; a: 1 &#125;
+Object.defineProperty(obj, &quot;b&quot;, &#123;
+    get: function () &#123;
+        return this.a;
+    &#125;,
+    set: function (v) &#123;
+        this.a = v;
+    &#125;
+&#125;);
+console.log(obj.b);
+obj.b = 2;
+console.log(obj.b);
+</code></pre>
+<p>以上示例中</p>
+<ul>
+<li>obj.b 获取 b 属性值时就会触发 get 方法</li>
+<li>obj.b = 2 为 b 属性赋值值就会触发 set 方法</li>
+</ul>
+<p>在某些业务场景中，用户在文本框输入之后，会触发oninput方法进行校验，标红等。但是如果使用js为input赋值却无法触发这些方法，那么就可以使用setter，getter来实现。</p>
+<h3 id="js修改input元素的value值时触发set方法"><a href="#js修改input元素的value值时触发set方法" class="headerlink" title="js修改input元素的value值时触发set方法"></a><code>js修改input元素的value值时触发set方法</code></h3><pre><code class="html">&lt;input id=&quot;xf&quot; type=&quot;text&quot; name=&quot;tt&quot; value=&quot;1&quot; /&gt;
+&lt;script type=&quot;text/javascript&quot;&gt;
+var inputProto = HTMLInputElement.prototype;
+Object.defineProperty(inputProto, &quot;value&quot;, &#123;
+    set: function (value) &#123;
+        var newValue = arguments.length ? value : this.value;
+        var node = this.attributes.value;
+        if (!node || newValue !== node.value) &#123;
+            var event = document.createEvent(&quot;Event&quot;);
+            event.initEvent(&quot;input&quot;, true, true);
+            this.setAttribute(&quot;value&quot;, newValue);
+            this.style.color = &#39;red&#39;
+            if (document.documentElement.contains(this)) &#123;
+                this.dispatchEvent(event);
+            &#125;
+        &#125;
+    &#125;
+&#125;);
+xf.oninput = function () &#123;
+    console.log(&quot;fire event oninput!&quot;);
+&#125;
+xf.value = 2;
+&lt;/script&gt;
+</code></pre>
+<p>上诉代码，当使用js修改input元素的value值时，触发set方法，使input的文字变成红色，并且触发oninput事件。</p>
+<p><code>注意</code>：</p>
+<p>上诉代码只在chrome下测试有效，其他浏览器的兼容方式可自行搜索。</p>
+
+    </div>
+  </section>
+
+  
+  
+</article>
+      <script>NProgress.set(0.6);</script>
+    </main>
+    
+    <!-- <footer class="footer">
+  <div class="footer-wrap">
+    <div class="footer-link">
+      
+      <h3>LINKS</h3>
+      <p>
+        
+          <a href="http://1x0.xyz/" target="_blank">Tian1x0</a>
+        
+          <a href="http://www.royalmice.com/hankzhou/" target="_blank">Hankzhou</a>
+        
+          <a href="http://sjydh.me/" target="_blank">设计有点货</a>
+        
+          <a href="https://developers.google.com/web/fundamentals/" target="_blank">Web fundamentals</a>
+        
+      </p>
+      
+    </div>
+    <div class="footer-tags">
+      
+    </div>
+    <div class="footer-info">
+        <div>Theme <span class="codename"><a href="https://github.com/GGICE/hexo-icer" target="_blank">icer</a></span> designed & coded by <a href="https://ice.gs/" target="_blank">GGICE</a></div>
+        <div>Copyright &copy; 2026, <a href="/">超级大馒头</a>  . All rights reserved .</div>
+      </div>
+  </div>
+</footer>
+ -->
+
+    <script>NProgress.set(0.8);</script>
+    
+  </div>
+
+  <script src="/js/highlight.min.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+
+<script src="/js/main.js"></script>
+
+
+<!-- Commit -->
+
+
+
+  <script>
+    NProgress.done();
+  </script>
+  
+</body>
+</html>

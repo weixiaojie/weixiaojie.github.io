@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  
+  <title>JAVA策略模式 | 超级大馒头</title>
+  <meta name="description" content="A amazing blog." />
+  <meta name="keywords" content="hexo,theme,mantou,plus" />
+  <meta name="HandheldFriendly" content="True" />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="在多场景的代码中，需要根据前端传来的参数走不同的代码逻辑，例如： public static void main(String[] args) &amp;#123;         String code &#x3D; &quot;前端传来的场景码&quot;;         String param &#x3D; &quot;前端传来的参数&quot;;         if ((&quot;0001&quot;).eq">
+<meta property="og:type" content="article">
+<meta property="og:title" content="JAVA策略模式">
+<meta property="og:url" content="http://example.com/2021/04/07/JAVA%E7%AD%96%E7%95%A5%E6%A8%A1%E5%BC%8F/index.html">
+<meta property="og:site_name" content="超级大馒头">
+<meta property="og:description" content="在多场景的代码中，需要根据前端传来的参数走不同的代码逻辑，例如： public static void main(String[] args) &amp;#123;         String code &#x3D; &quot;前端传来的场景码&quot;;         String param &#x3D; &quot;前端传来的参数&quot;;         if ((&quot;0001&quot;).eq">
+<meta property="og:locale">
+<meta property="article:published_time" content="2021-04-06T16:00:00.000Z">
+<meta property="article:modified_time" content="2023-02-25T05:34:24.000Z">
+<meta property="article:author" content="weixiaojie">
+<meta name="twitter:card" content="summary">
+  
+  
+    <link rel="icon" href="/image/favicon.ico">
+  
+
+  <link rel='stylesheet' href='/css/nprogress.css'/>
+  <link rel="stylesheet" href="/css/github-gist.min.css">
+  <link rel="stylesheet" href="/css/font_405585_yuudmyqpo3q.css">
+  <script src='/js/nprogress.min.js'></script>
+  <!-- <script>try{Typekit.load({ async: false });}catch(e){}</script> -->
+  
+<link rel="stylesheet" href="/style.css">
+
+  
+
+  
+
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+<body>
+  
+  <script>NProgress.start();</script>
+  
+  <div id="site-wrapper">
+    
+    <header class="header">
+  <div class="header-wrapper">
+    <a href="/">
+      <img src="/image/logo.jpg" class="logo"/>
+      <!-- <span class="site-desc">
+        
+      </span> -->
+    </a>
+    <div class="social-wrapper">
+      
+        
+          <a href="https://github.com/weixiaojie" class="social github" target="_blank" rel="external">
+            <span class="iconfont icon-github"></span>
+          </a>
+          
+          <a href="https://weibo.com/u/2156965395" class="social weibo" target="_blank" rel="external">
+            <span class="iconfont icon-weibo"></span>
+          </a>
+          
+          <a href="mailto:18565765503@163.com" class="social email" target="_blank" rel="external">
+            <span class="iconfont icon-email"></span>
+          </a>
+          
+      
+      
+      <a href="#" class="social search-do" target="_blank" rel="external">
+        <span class="iconfont icon-search"></span>
+      </a>
+            
+      <!-- <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><input type="hidden" name="sitesearch" value="http://example.com"></form> -->
+    </div>
+    <div class="search-wrap">
+      <div class="search-content animated fade-in">
+        <p class="search-input">
+          <span class="iconfont icon-search"></span>
+          <input tabindex="1">
+        </p>
+        <ul class="search-result">
+            
+        </ul>
+      </div>
+    </div>
+    <nav class="header-nav">
+      
+        <a href="/" class="archives">
+          首页
+        </a>
+        
+        <a href="/archives" class="archives">
+          归档
+        </a>
+        
+    </nav>
+  </div>
+</header>
+    <script>NProgress.set(0.4);</script>
+    
+    <main id="main" role="main">
+      <article id="post-JAVA策略模式"
+  class="post article white-box article-type-post animated fade-in-top"
+  itemscope itemprop="blogPost">
+  <section class="post-header article-header">
+    <h2 class="title">
+        <a href="/2021/04/07/JAVA%E7%AD%96%E7%95%A5%E6%A8%A1%E5%BC%8F/">
+          JAVA策略模式
+        </a>
+      </h2>
+      <div class="subtitle">
+          <time>
+            2021年04月07日
+          </time>
+          
+      </div>
+  </section>
+  <section class="content">
+    <div class="article-entry" itemprop="articleBody">
+      <p>在多场景的代码中，需要根据前端传来的参数走不同的代码逻辑，例如：</p>
+<pre><code>public static void main(String[] args) &#123;
+        String code = &quot;前端传来的场景码&quot;;
+        String param = &quot;前端传来的参数&quot;;
+        if ((&quot;0001&quot;).equals(code)) &#123;
+            System.out.println(&quot;开始执行场景0001的逻辑,参数&quot; + param);
+        &#125; else if ((&quot;0002&quot;).equals(code)) &#123;
+            System.out.println(&quot;开始执行场景0002的逻辑,参数&quot; + param);
+        &#125; else if ((&quot;0003&quot;).equals(code)) &#123;
+            System.out.println(&quot;开始执行场景0003的逻辑,参数&quot; + param);
+        &#125; else if ((&quot;0004&quot;).equals(code)) &#123;
+            System.out.println(&quot;开始执行场景0004的逻辑,参数&quot; + param);
+        &#125; else if ((&quot;0005&quot;).equals(code)) &#123;
+            System.out.println(&quot;开始执行场景0005的逻辑,参数&quot; + param);
+        &#125; else if ((&quot;0006&quot;).equals(code)) &#123;
+            System.out.println(&quot;开始执行场景0006的逻辑,参数&quot; + param);
+        &#125; else &#123;
+            System.out.println(&quot;场景编码不合适&quot;);
+        &#125;
+&#125;
+</code></pre>
+<p>每当有新的场景需要走新的逻辑的时候，就会需要修改代码，添加新的else if判断，这种情况修改同一个类的代码很容易不小心修改了前面的逻辑，可能把以前已经写好的代码弄出bug</p>
+<p>在设计模式中，有几个准则，其中一个准则是 “对修改关闭，对新增开放”，意思是当有新需求来的时候，尽量不修改代码，只新增代码，那么就可以用以下的代码来实现：</p>
+<p>###策略主类</p>
+<pre><code>package com.example.strategy;
+
+import java.util.HashMap;
+import java.util.Map;
+
+public class Strategy &#123;
+
+    private static Strategy instance = new Strategy();
+
+    public static Strategy GetInstance() &#123;
+        return instance;
+    &#125;
+
+    private static final Map&lt;String, AbstractStrategy&gt; map = new HashMap&lt;&gt;();
+
+    public static void excute(String code, String param) &#123;
+        map.get(code).excute(param);
+    &#125;
+
+    abstract public class AbstractStrategy &#123;
+
+        public abstract String getSceneCode();
+
+        public abstract void excute(String param);
+
+        public AbstractStrategy() &#123;
+            map.put(this.getSceneCode(), this);
+        &#125;
+
+    &#125;
+
+    public static void main(String[] args) &#123;
+        String code = &quot;前端传来的场景码&quot;;
+        String param = &quot;前端传来的参数&quot;;
+        Strategy.excute(&quot;code&quot;,param);
+    &#125;
+
+&#125;
+</code></pre>
+<p>#策略实现类0001</p>
+<pre><code>package com.example.strategy;
+
+@Component
+public class Strategy0001 extends Strategy.AbstractStrategy &#123;
+
+    Strategy0001() &#123;
+        //类上添加@Component注解， spring初始化bean时，会调用父类的构造函数，将当前bean注册到map中
+        Strategy.GetInstance().super();
+    &#125;
+
+    @Override
+    public String getSceneCode() &#123;
+        return &quot;0001&quot;;
+    &#125;
+
+    @Override
+    public void excute(String param) &#123;
+        System.out.println(&quot;开始执行场景0001的逻辑，参数为：&quot; + param);
+    &#125;
+
+&#125;
+</code></pre>
+<p>#策略实现类0002</p>
+<pre><code>package com.example.strategy;
+
+@Component
+public class Strategy0002 extends Strategy.AbstractStrategy &#123;
+
+    Strategy0002() &#123;
+        //类上添加@Component注解， spring初始化bean时，会调用父类的构造函数，将当前bean注册到map中
+        Strategy.GetInstance().super();
+    &#125;
+
+    @Override
+    public String getSceneCode() &#123;
+        return &quot;0002&quot;;
+    &#125;
+
+    @Override
+    public void excute(String param) &#123;
+        System.out.println(&quot;开始执行场景0002的逻辑，参数为：&quot; + param);
+    &#125;
+
+&#125;
+</code></pre>
+<p>通过以上代码，每当有新的业务场景来的时候，不用修改已经上线的代码，只需新增场景代码类，达到”对修改关闭，对新增开放”的效果。</p>
+
+    </div>
+  </section>
+
+  
+  
+</article>
+      <script>NProgress.set(0.6);</script>
+    </main>
+    
+    <!-- <footer class="footer">
+  <div class="footer-wrap">
+    <div class="footer-link">
+      
+      <h3>LINKS</h3>
+      <p>
+        
+          <a href="http://1x0.xyz/" target="_blank">Tian1x0</a>
+        
+          <a href="http://www.royalmice.com/hankzhou/" target="_blank">Hankzhou</a>
+        
+          <a href="http://sjydh.me/" target="_blank">设计有点货</a>
+        
+          <a href="https://developers.google.com/web/fundamentals/" target="_blank">Web fundamentals</a>
+        
+      </p>
+      
+    </div>
+    <div class="footer-tags">
+      
+    </div>
+    <div class="footer-info">
+        <div>Theme <span class="codename"><a href="https://github.com/GGICE/hexo-icer" target="_blank">icer</a></span> designed & coded by <a href="https://ice.gs/" target="_blank">GGICE</a></div>
+        <div>Copyright &copy; 2026, <a href="/">超级大馒头</a>  . All rights reserved .</div>
+      </div>
+  </div>
+</footer>
+ -->
+
+    <script>NProgress.set(0.8);</script>
+    
+  </div>
+
+  <script src="/js/highlight.min.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+
+<script src="/js/main.js"></script>
+
+
+<!-- Commit -->
+
+
+
+  <script>
+    NProgress.done();
+  </script>
+  
+</body>
+</html>

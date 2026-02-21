@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  
+  <title>编写Chrome插件 | 超级大馒头</title>
+  <meta name="description" content="A amazing blog." />
+  <meta name="keywords" content="hexo,theme,mantou,plus" />
+  <meta name="HandheldFriendly" content="True" />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="新建文件夹 simple-porxy,并在文件夹下新建如下文件：  manifest.json（描述文件） background.html（后台运行页面） background.js（后台运行js） on.png （插件图标）  manifest.json &amp;#123;   &quot;author&quot;: &quot;wxj&quot;,   &quot;background&quot;:">
+<meta property="og:type" content="article">
+<meta property="og:title" content="编写Chrome插件">
+<meta property="og:url" content="http://example.com/2019/04/25/%E7%BC%96%E5%86%99Chrome%E6%8F%92%E4%BB%B6/index.html">
+<meta property="og:site_name" content="超级大馒头">
+<meta property="og:description" content="新建文件夹 simple-porxy,并在文件夹下新建如下文件：  manifest.json（描述文件） background.html（后台运行页面） background.js（后台运行js） on.png （插件图标）  manifest.json &amp;#123;   &quot;author&quot;: &quot;wxj&quot;,   &quot;background&quot;:">
+<meta property="og:locale">
+<meta property="og:image" content="http://example.com/image/3.webp">
+<meta property="og:image" content="http://example.com/image/4.webp">
+<meta property="article:published_time" content="2019-04-24T16:00:00.000Z">
+<meta property="article:modified_time" content="2023-02-11T16:14:32.000Z">
+<meta property="article:author" content="weixiaojie">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/image/3.webp">
+  
+  
+    <link rel="icon" href="/image/favicon.ico">
+  
+
+  <link rel='stylesheet' href='/css/nprogress.css'/>
+  <link rel="stylesheet" href="/css/github-gist.min.css">
+  <link rel="stylesheet" href="/css/font_405585_yuudmyqpo3q.css">
+  <script src='/js/nprogress.min.js'></script>
+  <!-- <script>try{Typekit.load({ async: false });}catch(e){}</script> -->
+  
+<link rel="stylesheet" href="/style.css">
+
+  
+
+  
+
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+<body>
+  
+  <script>NProgress.start();</script>
+  
+  <div id="site-wrapper">
+    
+    <header class="header">
+  <div class="header-wrapper">
+    <a href="/">
+      <img src="/image/logo.jpg" class="logo"/>
+      <!-- <span class="site-desc">
+        
+      </span> -->
+    </a>
+    <div class="social-wrapper">
+      
+        
+          <a href="https://github.com/weixiaojie" class="social github" target="_blank" rel="external">
+            <span class="iconfont icon-github"></span>
+          </a>
+          
+          <a href="https://weibo.com/u/2156965395" class="social weibo" target="_blank" rel="external">
+            <span class="iconfont icon-weibo"></span>
+          </a>
+          
+          <a href="mailto:18565765503@163.com" class="social email" target="_blank" rel="external">
+            <span class="iconfont icon-email"></span>
+          </a>
+          
+      
+      
+      <a href="#" class="social search-do" target="_blank" rel="external">
+        <span class="iconfont icon-search"></span>
+      </a>
+            
+      <!-- <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><input type="hidden" name="sitesearch" value="http://example.com"></form> -->
+    </div>
+    <div class="search-wrap">
+      <div class="search-content animated fade-in">
+        <p class="search-input">
+          <span class="iconfont icon-search"></span>
+          <input tabindex="1">
+        </p>
+        <ul class="search-result">
+            
+        </ul>
+      </div>
+    </div>
+    <nav class="header-nav">
+      
+        <a href="/" class="archives">
+          首页
+        </a>
+        
+        <a href="/archives" class="archives">
+          归档
+        </a>
+        
+    </nav>
+  </div>
+</header>
+    <script>NProgress.set(0.4);</script>
+    
+    <main id="main" role="main">
+      <article id="post-编写Chrome插件"
+  class="post article white-box article-type-post animated fade-in-top"
+  itemscope itemprop="blogPost">
+  <section class="post-header article-header">
+    <h2 class="title">
+        <a href="/2019/04/25/%E7%BC%96%E5%86%99Chrome%E6%8F%92%E4%BB%B6/">
+          编写Chrome插件
+        </a>
+      </h2>
+      <div class="subtitle">
+          <time>
+            2019年04月25日
+          </time>
+          
+      </div>
+  </section>
+  <section class="content">
+    <div class="article-entry" itemprop="articleBody">
+      <p><code>新建文件夹 simple-porxy,并在文件夹下新建如下文件：</code></p>
+<ul>
+<li>manifest.json（描述文件）</li>
+<li>background.html（后台运行页面）</li>
+<li>background.js（后台运行js）</li>
+<li>on.png （插件图标）</li>
+</ul>
+<p><code>manifest.json</code></p>
+<pre><code class="json">&#123;
+  &quot;author&quot;: &quot;wxj&quot;,
+  &quot;background&quot;: &#123;
+    &quot;page&quot;: &quot;background.html&quot;
+  &#125;,
+  &quot;browser_action&quot;: &#123;
+    &quot;default_icon&quot;: &quot;on.png&quot;,
+    &quot;default_title&quot;: &quot;a simple proxy crx&quot;
+  &#125;,
+  &quot;description&quot;: &quot;This is a simple proxy crx&quot;,
+  &quot;manifest_version&quot;: 2,
+  &quot;name&quot;: &quot;simple-proxy&quot;,
+  &quot;short_name&quot;: &quot;sproxy&quot;,
+  &quot;permissions&quot;: [
+    &quot;proxy&quot;
+  ],
+  &quot;version&quot;: &quot;1.0&quot;
+&#125;
+</code></pre>
+<p><code>background.html</code> </p>
+<pre><code class="html">&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+  &lt;head&gt;
+    &lt;script src=&quot;background.js&quot;&gt;&lt;/script&gt;
+  &lt;/head&gt;
+  &lt;body&gt;
+  &lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
+<p><code>background.js</code></p>
+<pre><code class="javascript">chrome.proxy.settings.set(&#123;
+  value: &#123;
+    mode: &#39;fixed_servers&#39;,
+    rules: &#123;
+      proxyForHttp:&#123;
+        scheme: &#39;https&#39;,
+        host: &#39;default.px.skyzip.de&#39;,
+        port: 443
+      &#125;,
+      proxyForHttps: &#123;
+        scheme: &#39;https&#39;,
+        host: &#39;default.px.skyzip.de&#39;,
+        port: 443
+      &#125;,
+      bypassList: null
+    &#125;
+  &#125;,
+  scope: &#39;regular&#39;
+&#125;);
+</code></pre>
+<p>上诉代码的<code>host</code>来源于<code>skyZIP Proxy CRX 0.8.3</code>的源码，使用<code>winrar</code>打开下载好的<code>skyZIP Proxy CRX 0.8.3</code>，并解压，便可看到chrome插件的源代码。编写完以上三个文件后，打开chrome扩展程序的开发者模式，加载<code>simple-porxy</code>文件夹，即可安装插件</p>
+<p><img src="/image/3.webp" alt="打开chrome扩展程序"></p>
+<p><img src="/image/4.webp" alt="加载扩展程序"></p>
+<p><code>注意：</code></p>
+<p>以上代码实现了请求代理功能，浏览器的所有请求都将被代理至 <code>default.px.skyzip.de</code> 服务器，包括你在网页中输入的账号和密码等等。为了安全起见，建议自己购买服务器，并在服务器上安装代理转发工具，然后将 <code>background.js</code> 中的 <code>host</code> 改为你购买的服务器的IP地址。</p>
+<p>另外，使用chrome插件需要注意，某些chrome插件可能会监控用户在网页中的输入信息，包括账号密码等，比如著名的<code>adblock plus</code>插件（和adblock是两个不同的插件）就曾被曝出含有木马病毒。</p>
+
+    </div>
+  </section>
+
+  
+  
+</article>
+      <script>NProgress.set(0.6);</script>
+    </main>
+    
+    <!-- <footer class="footer">
+  <div class="footer-wrap">
+    <div class="footer-link">
+      
+      <h3>LINKS</h3>
+      <p>
+        
+          <a href="http://1x0.xyz/" target="_blank">Tian1x0</a>
+        
+          <a href="http://www.royalmice.com/hankzhou/" target="_blank">Hankzhou</a>
+        
+          <a href="http://sjydh.me/" target="_blank">设计有点货</a>
+        
+          <a href="https://developers.google.com/web/fundamentals/" target="_blank">Web fundamentals</a>
+        
+      </p>
+      
+    </div>
+    <div class="footer-tags">
+      
+    </div>
+    <div class="footer-info">
+        <div>Theme <span class="codename"><a href="https://github.com/GGICE/hexo-icer" target="_blank">icer</a></span> designed & coded by <a href="https://ice.gs/" target="_blank">GGICE</a></div>
+        <div>Copyright &copy; 2026, <a href="/">超级大馒头</a>  . All rights reserved .</div>
+      </div>
+  </div>
+</footer>
+ -->
+
+    <script>NProgress.set(0.8);</script>
+    
+  </div>
+
+  <script src="/js/highlight.min.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+
+<script src="/js/main.js"></script>
+
+
+<!-- Commit -->
+
+
+
+  <script>
+    NProgress.done();
+  </script>
+  
+</body>
+</html>

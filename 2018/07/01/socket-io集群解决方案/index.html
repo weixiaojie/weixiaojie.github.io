@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  
+  <title>socket-io集群解决方案 | 超级大馒头</title>
+  <meta name="description" content="A amazing blog." />
+  <meta name="keywords" content="hexo,theme,mantou,plus" />
+  <meta name="HandheldFriendly" content="True" />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="关于socket.io的群集解决方案，官网中给出了3个示例代码。除了负载均衡的软件不同，其他的代码其实都是一样的，分别为：nginx,httpd, haproxy。以下以nginx为例说明。官网给的demo基于docker，让你可以直接运行。代码结构如下：   首先代码index.js中加入redis适配var io &#x3D; require(&#39;socket.io&#39;)(3000); va">
+<meta property="og:type" content="article">
+<meta property="og:title" content="socket-io集群解决方案">
+<meta property="og:url" content="http://example.com/2018/07/01/socket-io%E9%9B%86%E7%BE%A4%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/index.html">
+<meta property="og:site_name" content="超级大馒头">
+<meta property="og:description" content="关于socket.io的群集解决方案，官网中给出了3个示例代码。除了负载均衡的软件不同，其他的代码其实都是一样的，分别为：nginx,httpd, haproxy。以下以nginx为例说明。官网给的demo基于docker，让你可以直接运行。代码结构如下：   首先代码index.js中加入redis适配var io &#x3D; require(&#39;socket.io&#39;)(3000); va">
+<meta property="og:locale">
+<meta property="og:image" content="http://example.com/image/2.webp">
+<meta property="article:published_time" content="2018-06-30T16:00:00.000Z">
+<meta property="article:modified_time" content="2023-02-11T16:14:32.000Z">
+<meta property="article:author" content="weixiaojie">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/image/2.webp">
+  
+  
+    <link rel="icon" href="/image/favicon.ico">
+  
+
+  <link rel='stylesheet' href='/css/nprogress.css'/>
+  <link rel="stylesheet" href="/css/github-gist.min.css">
+  <link rel="stylesheet" href="/css/font_405585_yuudmyqpo3q.css">
+  <script src='/js/nprogress.min.js'></script>
+  <!-- <script>try{Typekit.load({ async: false });}catch(e){}</script> -->
+  
+<link rel="stylesheet" href="/style.css">
+
+  
+
+  
+
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+<body>
+  
+  <script>NProgress.start();</script>
+  
+  <div id="site-wrapper">
+    
+    <header class="header">
+  <div class="header-wrapper">
+    <a href="/">
+      <img src="/image/logo.jpg" class="logo"/>
+      <!-- <span class="site-desc">
+        
+      </span> -->
+    </a>
+    <div class="social-wrapper">
+      
+        
+          <a href="https://github.com/weixiaojie" class="social github" target="_blank" rel="external">
+            <span class="iconfont icon-github"></span>
+          </a>
+          
+          <a href="https://weibo.com/u/2156965395" class="social weibo" target="_blank" rel="external">
+            <span class="iconfont icon-weibo"></span>
+          </a>
+          
+          <a href="mailto:18565765503@163.com" class="social email" target="_blank" rel="external">
+            <span class="iconfont icon-email"></span>
+          </a>
+          
+      
+      
+      <a href="#" class="social search-do" target="_blank" rel="external">
+        <span class="iconfont icon-search"></span>
+      </a>
+            
+      <!-- <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><input type="hidden" name="sitesearch" value="http://example.com"></form> -->
+    </div>
+    <div class="search-wrap">
+      <div class="search-content animated fade-in">
+        <p class="search-input">
+          <span class="iconfont icon-search"></span>
+          <input tabindex="1">
+        </p>
+        <ul class="search-result">
+            
+        </ul>
+      </div>
+    </div>
+    <nav class="header-nav">
+      
+        <a href="/" class="archives">
+          首页
+        </a>
+        
+        <a href="/archives" class="archives">
+          归档
+        </a>
+        
+    </nav>
+  </div>
+</header>
+    <script>NProgress.set(0.4);</script>
+    
+    <main id="main" role="main">
+      <article id="post-socket-io集群解决方案"
+  class="post article white-box article-type-post animated fade-in-top"
+  itemscope itemprop="blogPost">
+  <section class="post-header article-header">
+    <h2 class="title">
+        <a href="/2018/07/01/socket-io%E9%9B%86%E7%BE%A4%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/">
+          socket-io集群解决方案
+        </a>
+      </h2>
+      <div class="subtitle">
+          <time>
+            2018年07月01日
+          </time>
+          
+      </div>
+  </section>
+  <section class="content">
+    <div class="article-entry" itemprop="articleBody">
+      <p>关于socket.io的群集解决方案，官网中给出了3个示例代码。除了负载均衡的软件不同，其他的代码其实都是一样的，分别为：<code>nginx</code>,<code>httpd</code>, <code>haproxy</code>。以下以nginx为例说明。官网给的demo基于docker，让你可以直接运行。代码结构如下：</p>
+<p><img src="/image/2.webp" alt="socket.io集群结构"></p>
+<ul>
+<li><strong>首先代码<code>index.js</code>中加入<code>redis</code>适配</strong><pre><code>var io = require(&#39;socket.io&#39;)(3000);
+var redis = require(&#39;socket.io-redis&#39;);
+io.adapter(redis(&#123; host: &#39;localhost&#39;, port: 6379 &#125;));
+</code></pre>
+</li>
+</ul>
+<p>除此之外，和单机下的代码并无区别。由于客户端可能连接到集群中不同的节点，为了在集群中不同的节点之间传递消息，socket.io官方以redis的发布订阅功能为基础做了消息路由分发：<code>socket.io-redis</code>。<code>socket.io-redis</code>在节点向客户端群发消息时会将该消息发布到redis的订阅队列中，让其他节点能够订阅到该消息，从而实现节点间消息推送。</p>
+<ul>
+<li><strong><code>nginx</code>配置</strong></li>
+</ul>
+<pre><code>worker_processes 4;
+events &#123;
+  worker_connections 1024;
+&#125;
+http &#123;
+  server &#123;
+    listen 80;
+    location / &#123;
+      proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+      proxy_set_header Host $host;
+      proxy_pass http://nodes;
+      # enable WebSockets
+      proxy_http_version 1.1;
+      proxy_set_header Upgrade $http_upgrade;
+      proxy_set_header Connection &quot;upgrade&quot;;
+    &#125;
+  &#125;
+  upstream nodes &#123;
+    # enable sticky session
+    ip_hash;
+    server server-john:3000;
+    server server-paul:3000;
+    server server-george:3000;
+    server server-ringo:3000;
+  &#125;
+&#125;
+</code></pre>
+<p>该配置文件，在请求头中加入 <code>Upgrade</code> 来支持 <code>websocket</code><br>使用<code>ip_hash</code>保证同一个ip请求到固定的容器。将请求分发给四个服务：<code>server-john</code>,<code>server-paul</code>,<code>server-george</code>,<code>server-ringo</code>.</p>
+<ul>
+<li><strong><code>docker-compose</code>配置</strong></li>
+</ul>
+<pre><code>nginx:
+  build: ./nginx
+  links:
+    - server-john
+    - server-paul
+    - server-george
+    - server-ringo
+  ports:
+   - &quot;3000:80&quot;
+
+server-john:
+  build: ./server
+  links:
+    - redis
+  expose:
+    - &quot;3000&quot;
+  environment:
+    - NAME=John
+
+server-paul:
+  build: ./server
+  links:
+    - redis
+  expose:
+    - &quot;3000&quot;
+  environment:
+    - NAME=Paul
+
+server-george:
+  build: ./server
+  links:
+    - redis
+  expose:
+    - &quot;3000&quot;
+  environment:
+    - NAME=George
+
+server-ringo:
+  build: ./server
+  links:
+    - redis
+  expose:
+    - &quot;3000&quot;
+  environment:
+    - NAME=Ringo
+
+redis:
+  image: redis:alpine
+  expose:
+    - &quot;6379&quot;
+</code></pre>
+<p>该配置文件中，nginx依赖四个web服务，每个web服务都依赖redis。每个服务都暴露3000端口。<code>environment</code>环境变量用于标示当前的服务器名称，以此来告诉客户端请求被分发到哪台服务器了。会在<code>index.js</code>以下的代码中用到。</p>
+<pre><code>var serverName = process.env.NAME || &#39;Unknown&#39;;
+</code></pre>
+<ul>
+<li>每个服务的docker配置</li>
+</ul>
+<pre><code>FROM mhart/alpine-node:6
+
+# Create app directory
+RUN mkdir -p /usr/src/app
+WORKDIR /usr/src/app
+
+# Install app dependencies
+COPY package.json /usr/src/app/
+RUN npm install
+
+# Bundle app source
+COPY . /usr/src/app
+
+EXPOSE 3000
+CMD [ &quot;npm&quot;, &quot;start&quot; ]
+</code></pre>
+<p>该配置功能：拷贝package.json，安装依赖，拷贝源文件，启动服务。</p>
+<p>由于示例采用docker安装，只要你的电脑中有安装docker，当我们下载完官方的代码，直接在代码根目录下运行以下命令便可启动服务进行测试。</p>
+<pre><code>$ docker-compose up -d
+</code></pre>
+<ul>
+<li><strong><code>注意</code></strong></li>
+</ul>
+<p>官网的  <code>socket.io-redis</code>库只有在消息广播<code>(socket.broadcast.emit)</code>的时候，才能生效。对于私发的消息，如果想在集群不同节点之间传递还是需要自己手动写一个解决方案，具体可以参考redis的发布订阅功能在nodejs下的api。</p>
+
+    </div>
+  </section>
+
+  
+  
+</article>
+      <script>NProgress.set(0.6);</script>
+    </main>
+    
+    <!-- <footer class="footer">
+  <div class="footer-wrap">
+    <div class="footer-link">
+      
+      <h3>LINKS</h3>
+      <p>
+        
+          <a href="http://1x0.xyz/" target="_blank">Tian1x0</a>
+        
+          <a href="http://www.royalmice.com/hankzhou/" target="_blank">Hankzhou</a>
+        
+          <a href="http://sjydh.me/" target="_blank">设计有点货</a>
+        
+          <a href="https://developers.google.com/web/fundamentals/" target="_blank">Web fundamentals</a>
+        
+      </p>
+      
+    </div>
+    <div class="footer-tags">
+      
+    </div>
+    <div class="footer-info">
+        <div>Theme <span class="codename"><a href="https://github.com/GGICE/hexo-icer" target="_blank">icer</a></span> designed & coded by <a href="https://ice.gs/" target="_blank">GGICE</a></div>
+        <div>Copyright &copy; 2026, <a href="/">超级大馒头</a>  . All rights reserved .</div>
+      </div>
+  </div>
+</footer>
+ -->
+
+    <script>NProgress.set(0.8);</script>
+    
+  </div>
+
+  <script src="/js/highlight.min.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+
+<script src="/js/main.js"></script>
+
+
+<!-- Commit -->
+
+
+
+  <script>
+    NProgress.done();
+  </script>
+  
+</body>
+</html>

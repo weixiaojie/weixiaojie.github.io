@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  
+  <title>使用cheerio爬取gank-io妹子图 | 超级大馒头</title>
+  <meta name="description" content="A amazing blog." />
+  <meta name="keywords" content="hexo,theme,mantou,plus" />
+  <meta name="HandheldFriendly" content="True" />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="cheerio是nodejs的抓取页面模块，只需输入html，然后就可以像Jquery一样获取dom结构信息： const cheerio &#x3D; require(&#39;cheerio&#39;) const $ &#x3D; cheerio.load(&#39;&lt;h2 class&#x3D;&quot;title&quot;&gt;Hello world&lt;&#x2F;h2&gt;&#39;)   $(&#39;h">
+<meta property="og:type" content="article">
+<meta property="og:title" content="使用cheerio爬取gank-io妹子图">
+<meta property="og:url" content="http://example.com/2018/11/13/%E4%BD%BF%E7%94%A8cheerio%E7%88%AC%E5%8F%96gank-io%E5%A6%B9%E5%AD%90%E5%9B%BE/index.html">
+<meta property="og:site_name" content="超级大馒头">
+<meta property="og:description" content="cheerio是nodejs的抓取页面模块，只需输入html，然后就可以像Jquery一样获取dom结构信息： const cheerio &#x3D; require(&#39;cheerio&#39;) const $ &#x3D; cheerio.load(&#39;&lt;h2 class&#x3D;&quot;title&quot;&gt;Hello world&lt;&#x2F;h2&gt;&#39;)   $(&#39;h">
+<meta property="og:locale">
+<meta property="article:published_time" content="2018-11-12T16:00:00.000Z">
+<meta property="article:modified_time" content="2023-02-11T16:14:32.000Z">
+<meta property="article:author" content="weixiaojie">
+<meta name="twitter:card" content="summary">
+  
+  
+    <link rel="icon" href="/image/favicon.ico">
+  
+
+  <link rel='stylesheet' href='/css/nprogress.css'/>
+  <link rel="stylesheet" href="/css/github-gist.min.css">
+  <link rel="stylesheet" href="/css/font_405585_yuudmyqpo3q.css">
+  <script src='/js/nprogress.min.js'></script>
+  <!-- <script>try{Typekit.load({ async: false });}catch(e){}</script> -->
+  
+<link rel="stylesheet" href="/style.css">
+
+  
+
+  
+
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+<body>
+  
+  <script>NProgress.start();</script>
+  
+  <div id="site-wrapper">
+    
+    <header class="header">
+  <div class="header-wrapper">
+    <a href="/">
+      <img src="/image/logo.jpg" class="logo"/>
+      <!-- <span class="site-desc">
+        
+      </span> -->
+    </a>
+    <div class="social-wrapper">
+      
+        
+          <a href="https://github.com/weixiaojie" class="social github" target="_blank" rel="external">
+            <span class="iconfont icon-github"></span>
+          </a>
+          
+          <a href="https://weibo.com/u/2156965395" class="social weibo" target="_blank" rel="external">
+            <span class="iconfont icon-weibo"></span>
+          </a>
+          
+          <a href="mailto:18565765503@163.com" class="social email" target="_blank" rel="external">
+            <span class="iconfont icon-email"></span>
+          </a>
+          
+      
+      
+      <a href="#" class="social search-do" target="_blank" rel="external">
+        <span class="iconfont icon-search"></span>
+      </a>
+            
+      <!-- <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><input type="hidden" name="sitesearch" value="http://example.com"></form> -->
+    </div>
+    <div class="search-wrap">
+      <div class="search-content animated fade-in">
+        <p class="search-input">
+          <span class="iconfont icon-search"></span>
+          <input tabindex="1">
+        </p>
+        <ul class="search-result">
+            
+        </ul>
+      </div>
+    </div>
+    <nav class="header-nav">
+      
+        <a href="/" class="archives">
+          首页
+        </a>
+        
+        <a href="/archives" class="archives">
+          归档
+        </a>
+        
+    </nav>
+  </div>
+</header>
+    <script>NProgress.set(0.4);</script>
+    
+    <main id="main" role="main">
+      <article id="post-使用cheerio爬取gank-io妹子图"
+  class="post article white-box article-type-post animated fade-in-top"
+  itemscope itemprop="blogPost">
+  <section class="post-header article-header">
+    <h2 class="title">
+        <a href="/2018/11/13/%E4%BD%BF%E7%94%A8cheerio%E7%88%AC%E5%8F%96gank-io%E5%A6%B9%E5%AD%90%E5%9B%BE/">
+          使用cheerio爬取gank-io妹子图
+        </a>
+      </h2>
+      <div class="subtitle">
+          <time>
+            2018年11月13日
+          </time>
+          
+      </div>
+  </section>
+  <section class="content">
+    <div class="article-entry" itemprop="articleBody">
+      <p><code>cheerio</code>是<code>nodejs</code>的抓取页面模块，只需输入<code>html</code>，然后就可以像<code>Jquery</code>一样获取<code>dom</code>结构信息：</p>
+<pre><code>const cheerio = require(&#39;cheerio&#39;)
+const $ = cheerio.load(&#39;&lt;h2 class=&quot;title&quot;&gt;Hello world&lt;/h2&gt;&#39;)
+ 
+$(&#39;h2.title&#39;).text(&#39;Hello there!&#39;)
+$(&#39;h2&#39;).addClass(&#39;welcome&#39;)
+ 
+$.html()
+//=&gt; &lt;html&gt;&lt;head&gt;&lt;/head&gt;&lt;body&gt;&lt;h2 class=&quot;title welcome&quot;&gt;Hello there!&lt;/h2&gt;&lt;/body&gt;&lt;/html&gt;
+</code></pre>
+<h3 id="命令终端（空目录下）"><a href="#命令终端（空目录下）" class="headerlink" title="命令终端（空目录下）"></a><code>命令终端（空目录下）</code></h3><pre><code>npm init（一直回车初始化项目）
+npm install cheerio --save（安装依赖）
+node index.js（启动爬取脚本）
+</code></pre>
+<h3 id="index-js"><a href="#index-js" class="headerlink" title="index.js"></a><code>index.js</code></h3><pre><code>// 加载http模块
+var https = require(&#39;https&#39;);
+var http = require(&#39;http&#39;);
+var fs = require(&#39;fs&#39;);
+// Cheerio 是一个Node.js的库， 它可以从html的片断中构建DOM结构，然后提供像jquery一样的css选择器查询
+var cheerio = require(&#39;cheerio&#39;);
+//忽略https证书
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = &#39;0&#39;;
+//获取网页信息
+function getGank(fileName) &#123;
+    //定义请求地址，请求协议，请求头
+    const options = &#123;
+        hostname: &#39;gank.io&#39;,
+        port: 443,
+        path: &#39;/&#39;,
+        method: &#39;GET&#39;,
+        headers: &#123;
+            &#39;User-Agent&#39;: &#39;Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.131 Safari/537.36&#39;
+        &#125;,
+    &#125;;
+    https.get(options, function (res) &#123;
+        var html = &#39;&#39;;
+        // 获取页面数据
+        res.on(&#39;data&#39;, function (data) &#123;
+            html += data;
+        &#125;);
+        // 数据获取结束
+        res.on(&#39;end&#39;, function () &#123;
+            var $ = cheerio.load(html);
+            //此处的选择器需要根据网站的更新不断的改变
+            var imgSrc = $(&quot;div.container.content div.outlink img&quot;).attr(&quot;src&quot;);
+            var href = $(&quot;div.container.content div.row div.six.columns&quot;).eq(1).find(&quot;a&quot;).attr(&quot;href&quot;);
+            var nextUrl = root + href;
+            var nextFileName = href.replace(/\//g, &quot;-&quot;).replace(&quot;-&quot;, &quot;&quot;);
+            saveImg(imgSrc, fileName, nextUrl, nextFileName);
+        &#125;);
+    &#125;).on(&#39;error&#39;, function () &#123;
+        console.log(&#39;获取数据出错！&#39;);
+    &#125;);
+&#125;
+//保存图片,需要在index.js所在目录下新建image文件夹
+function saveImg(url, fileName, nextUrl, nextFileName) &#123;
+    var protocol;
+    if (url.indexOf(&quot;https&quot;) != -1) &#123;
+        protocol = https;
+    &#125; else &#123;
+        protocol = http;
+    &#125;
+    protocol.get(url, function (res) &#123;
+        var imgData = &quot;&quot;;
+        res.setEncoding(&quot;binary&quot;);
+        res.on(&quot;data&quot;, function (chunk) &#123;
+            imgData += chunk;
+        &#125;);
+        res.on(&quot;end&quot;, function () &#123;
+            fs.writeFile(&quot;./image/&quot; + fileName + &quot;.jpg&quot;, imgData, &quot;binary&quot;, function (err) &#123;
+                if (err) &#123;
+                    console.log(&quot;down fail:&quot; + err);
+                &#125;
+                console.log(&quot;down success:&quot; + fileName);
+                getGank(nextUrl, nextFileName);
+            &#125;);
+        &#125;);
+    &#125;);
+&#125;
+getGank(&#39;new&#39;);
+</code></pre>
+<p>以上通过分析网页的方式爬取图片，由于部分文章的dom结构比较特殊，无法获取图片，幸运的是该网站也提供API直接获取图片，所以也可以用以下方式获取，无需安装依赖</p>
+<h3 id="index-js-API方式获取"><a href="#index-js-API方式获取" class="headerlink" title="index.js (API方式获取)"></a><code>index.js (API方式获取)</code></h3><pre><code>var https = require(&#39;https&#39;);
+var http = require(&#39;http&#39;);
+var fs = require(&#39;fs&#39;);
+// 定义网络爬虫的目标地址
+//忽略https证书
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = &#39;0&#39;;
+var data;
+//获取所有图片信息
+function getGank() &#123;
+    const options = &#123;
+        hostname: &#39;gank.io&#39;,
+        port: 443,
+        path: &#39;/api/data/%E7%A6%8F%E5%88%A9/1000/1&#39;,
+        method: &#39;GET&#39;,
+        headers: &#123;
+            &#39;User-Agent&#39;: &#39;Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.131 Safari/537.36&#39;
+        &#125;,
+    &#125;;
+    https.get(options, function (res) &#123;
+        var html = &#39;&#39;;
+        // 获取页面数据
+        res.on(&#39;data&#39;, function (data) &#123;
+            html += data;
+        &#125;);
+        // 数据获取结束
+        res.on(&#39;end&#39;, function () &#123;
+            data = JSON.parse(html).results;
+            console.log(&quot;图片总数：&quot; + data.length);
+            saveImg(0);
+        &#125;);
+    &#125;).on(&#39;error&#39;, function () &#123;
+        console.log(&#39;获取数据出错！&#39;);
+    &#125;);
+&#125;
+//保存图片
+function saveImg(index) &#123;
+    if (index == data.length) &#123;
+        return;
+    &#125;
+    var url = data[index].url, fileName = data[index].createdAt.replace(/:/g, &quot;-&quot;);
+    fs.exists(&quot;./image/&quot; + fileName + &quot;.jpg&quot;, function (exists) &#123;
+        if (!exists) &#123;
+            var protocol = url.indexOf(&quot;https&quot;) != -1 ? https : http;
+            protocol.get(url, function (res) &#123;
+                var imgData = &quot;&quot;;
+                res.setEncoding(&quot;binary&quot;);
+                res.on(&quot;data&quot;, function (chunk) &#123;
+                    imgData += chunk;
+                &#125;);
+                res.on(&quot;end&quot;, function () &#123;
+                    fs.writeFile(&quot;./image/&quot; + fileName + &quot;.jpg&quot;, imgData, &quot;binary&quot;, function (err) &#123;
+                        if (err) &#123;
+                            console.log(&quot;down fail:&quot; + err);
+                        &#125;
+                        console.log(&quot;down success:&quot; + fileName);
+                        saveImg(++index);
+                    &#125;);
+                &#125;);
+            &#125;);
+        &#125;else&#123;
+            saveImg(++index);
+        &#125;
+    &#125;);
+&#125;
+
+fs.exists(&quot;./image&quot;, function (exists) &#123;
+    console.log(&quot;当前目录是否存在image文件夹：&quot; + exists);
+    exists ? getGank() : fs.mkdir(&quot;./image&quot;, function (err) &#123;
+        if (err) &#123;
+            return console.error(err);
+        &#125;
+        console.log(&quot;目录创建成功。&quot;);
+        getGank();
+    &#125;);
+&#125;);
+</code></pre>
+
+    </div>
+  </section>
+
+  
+  
+</article>
+      <script>NProgress.set(0.6);</script>
+    </main>
+    
+    <!-- <footer class="footer">
+  <div class="footer-wrap">
+    <div class="footer-link">
+      
+      <h3>LINKS</h3>
+      <p>
+        
+          <a href="http://1x0.xyz/" target="_blank">Tian1x0</a>
+        
+          <a href="http://www.royalmice.com/hankzhou/" target="_blank">Hankzhou</a>
+        
+          <a href="http://sjydh.me/" target="_blank">设计有点货</a>
+        
+          <a href="https://developers.google.com/web/fundamentals/" target="_blank">Web fundamentals</a>
+        
+      </p>
+      
+    </div>
+    <div class="footer-tags">
+      
+    </div>
+    <div class="footer-info">
+        <div>Theme <span class="codename"><a href="https://github.com/GGICE/hexo-icer" target="_blank">icer</a></span> designed & coded by <a href="https://ice.gs/" target="_blank">GGICE</a></div>
+        <div>Copyright &copy; 2026, <a href="/">超级大馒头</a>  . All rights reserved .</div>
+      </div>
+  </div>
+</footer>
+ -->
+
+    <script>NProgress.set(0.8);</script>
+    
+  </div>
+
+  <script src="/js/highlight.min.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+
+<script src="/js/main.js"></script>
+
+
+<!-- Commit -->
+
+
+
+  <script>
+    NProgress.done();
+  </script>
+  
+</body>
+</html>

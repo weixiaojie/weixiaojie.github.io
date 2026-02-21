@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  
+  <title>OpenSessionInViewFilter源码浅析 | 超级大馒头</title>
+  <meta name="description" content="A amazing blog." />
+  <meta name="keywords" content="hexo,theme,mantou,plus" />
+  <meta name="HandheldFriendly" content="True" />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="使用hibernate和spring的项目大部分都有可能会用到OpenSessionInViewFilter和Transactioninterceptor。OpenSessionInViewFilter的主要目的是为了解决hibernate在view层的进行懒加载的时候会遇到session被close的问题。Transactioninterceptor事务拦截器为spring的声明式事务，方便开启">
+<meta property="og:type" content="article">
+<meta property="og:title" content="OpenSessionInViewFilter源码浅析">
+<meta property="og:url" content="http://example.com/2017/07/09/OpenSessionInViewFilter%E6%BA%90%E7%A0%81%E6%B5%85%E6%9E%90/index.html">
+<meta property="og:site_name" content="超级大馒头">
+<meta property="og:description" content="使用hibernate和spring的项目大部分都有可能会用到OpenSessionInViewFilter和Transactioninterceptor。OpenSessionInViewFilter的主要目的是为了解决hibernate在view层的进行懒加载的时候会遇到session被close的问题。Transactioninterceptor事务拦截器为spring的声明式事务，方便开启">
+<meta property="og:locale">
+<meta property="article:published_time" content="2017-07-08T16:00:00.000Z">
+<meta property="article:modified_time" content="2023-04-04T11:04:08.000Z">
+<meta property="article:author" content="weixiaojie">
+<meta name="twitter:card" content="summary">
+  
+  
+    <link rel="icon" href="/image/favicon.ico">
+  
+
+  <link rel='stylesheet' href='/css/nprogress.css'/>
+  <link rel="stylesheet" href="/css/github-gist.min.css">
+  <link rel="stylesheet" href="/css/font_405585_yuudmyqpo3q.css">
+  <script src='/js/nprogress.min.js'></script>
+  <!-- <script>try{Typekit.load({ async: false });}catch(e){}</script> -->
+  
+<link rel="stylesheet" href="/style.css">
+
+  
+
+  
+
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+<body>
+  
+  <script>NProgress.start();</script>
+  
+  <div id="site-wrapper">
+    
+    <header class="header">
+  <div class="header-wrapper">
+    <a href="/">
+      <img src="/image/logo.jpg" class="logo"/>
+      <!-- <span class="site-desc">
+        
+      </span> -->
+    </a>
+    <div class="social-wrapper">
+      
+        
+          <a href="https://github.com/weixiaojie" class="social github" target="_blank" rel="external">
+            <span class="iconfont icon-github"></span>
+          </a>
+          
+          <a href="https://weibo.com/u/2156965395" class="social weibo" target="_blank" rel="external">
+            <span class="iconfont icon-weibo"></span>
+          </a>
+          
+          <a href="mailto:18565765503@163.com" class="social email" target="_blank" rel="external">
+            <span class="iconfont icon-email"></span>
+          </a>
+          
+      
+      
+      <a href="#" class="social search-do" target="_blank" rel="external">
+        <span class="iconfont icon-search"></span>
+      </a>
+            
+      <!-- <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><input type="hidden" name="sitesearch" value="http://example.com"></form> -->
+    </div>
+    <div class="search-wrap">
+      <div class="search-content animated fade-in">
+        <p class="search-input">
+          <span class="iconfont icon-search"></span>
+          <input tabindex="1">
+        </p>
+        <ul class="search-result">
+            
+        </ul>
+      </div>
+    </div>
+    <nav class="header-nav">
+      
+        <a href="/" class="archives">
+          首页
+        </a>
+        
+        <a href="/archives" class="archives">
+          归档
+        </a>
+        
+    </nav>
+  </div>
+</header>
+    <script>NProgress.set(0.4);</script>
+    
+    <main id="main" role="main">
+      <article id="post-OpenSessionInViewFilter源码浅析"
+  class="post article white-box article-type-post animated fade-in-top"
+  itemscope itemprop="blogPost">
+  <section class="post-header article-header">
+    <h2 class="title">
+        <a href="/2017/07/09/OpenSessionInViewFilter%E6%BA%90%E7%A0%81%E6%B5%85%E6%9E%90/">
+          OpenSessionInViewFilter源码浅析
+        </a>
+      </h2>
+      <div class="subtitle">
+          <time>
+            2017年07月09日
+          </time>
+          
+      </div>
+  </section>
+  <section class="content">
+    <div class="article-entry" itemprop="articleBody">
+      <p>使用hibernate和spring的项目大部分都有可能会用到OpenSessionInViewFilter和Transactioninterceptor。OpenSessionInViewFilter的主要目的是为了解决hibernate在view层的进行懒加载的时候会遇到session被close的问题。Transactioninterceptor事务拦截器为spring的声明式事务，方便开启和提交事务，不用每次都手动编写hibernate事务相关代码。</p>
+<p>先看OpenSessionInViewFilter，在web.xml中的filter配置如下：</p>
+<h3 id="web-xml"><a href="#web-xml" class="headerlink" title="web.xml"></a>web.xml</h3><pre><code class="xml">&lt;filter&gt;
+        &lt;filter-name&gt;hibernateFilter&lt;/filter-name&gt;
+        &lt;filter-class&gt;
+            org.springframework.orm.hibernate3.support.OpenSessionInViewFilter
+        &lt;/filter-class&gt;
+        &lt;init-param&gt;
+            &lt;param-name&gt;sessionFactoryBeanName&lt;/param-name&gt;
+            &lt;param-value&gt;sessionFactory&lt;/param-value&gt;
+        &lt;/init-param&gt;
+        &lt;init-param&gt;
+            &lt;param-name&gt;singleSession&lt;/param-name&gt;
+            &lt;param-value&gt;true&lt;/param-value&gt;
+        &lt;/init-param&gt;
+&lt;/filter&gt;
+</code></pre>
+<p>初始化参数singleSession可选值有true(单session)和false(多session)，打开源码，找到入口方法doFilterInternal如下：</p>
+<h3 id="OpenSessionInViewFilter"><a href="#OpenSessionInViewFilter" class="headerlink" title="OpenSessionInViewFilter"></a>OpenSessionInViewFilter</h3><pre><code class="java">protected void doFilterInternal(
+            HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+            throws ServletException, IOException &#123;
+        SessionFactory sessionFactory = lookupSessionFactory(request);
+        boolean participate = false;
+        if (isSingleSession()) &#123;
+             //此处省略n行代码......
+            logger.debug(&quot;Opening single Hibernate Session in OpenSessionInViewFilter&quot;);
+            Session session = getSession(sessionFactory);
+            TransactionSynchronizationManager.bindResource(sessionFactory, new SessionHolder(session));
+        &#125;
+        else &#123;
+            //此处省略n行代码......
+            SessionFactoryUtils.initDeferredClose(sessionFactory);
+        &#125;
+        try &#123;
+            filterChain.doFilter(request, response);
+        &#125;
+        finally &#123;
+            if (!participate) &#123;
+                if (isSingleSession()) &#123;
+                    // single session mode
+                    SessionHolder sessionHolder =
+                            (SessionHolder) TransactionSynchronizationManager.unbindResource(sessionFactory);
+                    logger.debug(&quot;Closing single Hibernate Session in OpenSessionInViewFilter&quot;);
+                    closeSession(sessionHolder.getSession(), sessionFactory);
+                &#125;
+                else &#123;
+                    // deferred close mode
+                    SessionFactoryUtils.processDeferredClose(sessionFactory);
+                &#125;
+            &#125;
+        &#125;
+    &#125;
+</code></pre>
+<p>单session的情况下，请求开始时，先通过getSession方法取到一个session，然后将sessionFactory作为key，SessionHolder作为value绑定到resources中，请求结束的时候，解除绑定session并关闭session。多session的时候，请求开始时执行initDeferredClose方法标记请求过程中产生的所有session都延迟关闭，请求结束时才关闭所有的session，也就是关闭请求中所有被保存起来的session。中间的filterChain.doFilter(request, response)方法是执行其他filter的拦截方法以及请求对应的具体处理内容。</p>
+<p>先看一下单session的bindResource方法如下：</p>
+<h3 id="bindResource"><a href="#bindResource" class="headerlink" title="bindResource"></a>bindResource</h3><pre><code class="java">public static void bindResource(Object key, Object value) throws IllegalStateException &#123;
+        //此处省略n行代码......
+        Map&lt;Object, Object&gt; map = resources.get();
+        // set ThreadLocal Map if none found
+        if (map == null) &#123;
+            map = new HashMap&lt;Object, Object&gt;();
+            resources.set(map);
+        &#125;
+        Object oldValue = map.put(actualKey, value);
+        //此处省略n行代码......
+&#125;
+</code></pre>
+<p>可以发现resources是一个ThreadLocal类型的变量，其内部实现是一个Map，以当前线程作为key，来达到［整个请求线程共享变量并且多个请求之间不会相互影响］的作用：</p>
+<h3 id="ThreadLocal"><a href="#ThreadLocal" class="headerlink" title="ThreadLocal"></a>ThreadLocal</h3><pre><code>private static final ThreadLocal&lt;Map&lt;Object, Object&gt;&gt; resources =
+            new NamedThreadLocal&lt;Map&lt;Object, Object&gt;&gt;(&quot;Transactional resources&quot;);
+</code></pre>
+<p>单session情况下，请求开始就获取session，而多session时候则是执行的initDeferredClose这个方法：</p>
+<h3 id="initDeferredClose"><a href="#initDeferredClose" class="headerlink" title="initDeferredClose"></a>initDeferredClose</h3><pre><code class="java">public static void initDeferredClose(SessionFactory sessionFactory) &#123;
+        Assert.notNull(sessionFactory, &quot;No SessionFactory specified&quot;);
+        logger.debug(&quot;Initializing deferred close of Hibernate Sessions&quot;);
+        Map&lt;SessionFactory, Set&lt;Session&gt;&gt; holderMap = deferredCloseHolder.get();
+        if (holderMap == null) &#123;
+            holderMap = new HashMap&lt;SessionFactory, Set&lt;Session&gt;&gt;();
+            deferredCloseHolder.set(holderMap);
+        &#125;
+        holderMap.put(sessionFactory, new LinkedHashSet&lt;Session&gt;(4));
+&#125;
+</code></pre>
+<p>这个方法首先判断deferredCloseHolder中是否含有holderMap，如果没有，就新建一个map变量并set到deferredCloseHolder，这个map中的Set<Session>集合后面会用来保存请求过程中所有产生的session，请求中的数据库操作只要发现deferredCloseHolder中有值，就不会去关闭session，而是将session保存到set集合里，等到请求结束才关闭session。同样可以发现这个deferredCloseHolder也是一个ThreadLocal类型的变量：</p>
+<h3 id="deferredCloseHolder"><a href="#deferredCloseHolder" class="headerlink" title="deferredCloseHolder"></a>deferredCloseHolder</h3><pre><code class="java">private static final ThreadLocal&lt;Map&lt;SessionFactory, Set&lt;Session&gt;&gt;&gt; deferredCloseHolder =
+            new NamedThreadLocal&lt;Map&lt;SessionFactory, Set&lt;Session&gt;&gt;&gt;(&quot;Hibernate Sessions registered for deferred close&quot;);
+</code></pre>
+<p>多session请求结束时候，执行延迟关闭方法：<br>###processDeferredClose</p>
+<pre><code class="java">public static void processDeferredClose(SessionFactory sessionFactory) &#123;
+        Assert.notNull(sessionFactory, &quot;No SessionFactory specified&quot;);
+        Map&lt;SessionFactory, Set&lt;Session&gt;&gt; holderMap = deferredCloseHolder.get();
+        if (holderMap == null || !holderMap.containsKey(sessionFactory)) &#123;
+            throw new IllegalStateException(&quot;Deferred close not active for SessionFactory [&quot; + sessionFactory + &quot;]&quot;);
+        &#125;
+        logger.debug(&quot;Processing deferred close of Hibernate Sessions&quot;);
+        Set&lt;Session&gt; sessions = holderMap.remove(sessionFactory);
+        for (Session session : sessions) &#123;
+            closeSession(session);
+        &#125;
+        if (holderMap.isEmpty()) &#123;
+            deferredCloseHolder.remove();
+        &#125;
+&#125;
+</code></pre>
+<p>可以看到，此处的holderMap就是请求开始时往deferredCloseHolder中put的变量，然后从holderMap取出请求过程中产生的所有session并关闭。</p>
+<p>接着回头看单session的时候，会用getSession方法取到一个sesson：</p>
+<h3 id="getSession"><a href="#getSession" class="headerlink" title="getSession"></a>getSession</h3><pre><code class="java">protected Session getSession(SessionFactory sessionFactory) throws DataAccessResourceFailureException &#123;
+        Session session = SessionFactoryUtils.getSession(sessionFactory, true);
+        FlushMode flushMode = getFlushMode();
+        if (flushMode != null) &#123;
+            session.setFlushMode(flushMode);
+        &#125;
+        return session;
+&#125;
+</code></pre>
+<pre><code class="java">private FlushMode flushMode = FlushMode.MANUAL;
+</code></pre>
+<p>此处有个细节就是，获取到session的时候会把这个session的FlushMode设置为默认的Manual状态，这个Manual状态会导致执行HibernateTemplate的增删改方法（无事务的dao方法）报错，只能执行查询方法。解决方案有两个：</p>
+<ul>
+<li><p>可以通过将HibernateTemplate的增删改方法（常称dao方法）该为执行spring事务拦截方法（常称service方法），事务拦截器会把session的flushMode改为auto，事务结束之后再重新设置为原来的Manual状态。</p>
+</li>
+<li><p>新建一个java类继承OpenSessionInViewFilter,改写getSession方法的FlushMode，将该java类代替OpenSessionInViewFilter配置到web.xml中</p>
+</li>
+</ul>
+<p>跟踪到getSession方法的内部实现doGetSession方法，这个方法在HibernateTemplate的增删改查和事务拦截器Transactioninterceptor创建事务的时候也都会用到：</p>
+<h3 id="doGetSession"><a href="#doGetSession" class="headerlink" title="doGetSession"></a>doGetSession</h3><pre><code class="java">private static Session doGetSession(
+            SessionFactory sessionFactory, Interceptor entityInterceptor,
+            SQLExceptionTranslator jdbcExceptionTranslator, boolean allowCreate)
+            throws HibernateException, IllegalStateException &#123;
+
+        Assert.notNull(sessionFactory, &quot;No SessionFactory specified&quot;);
+
+        Object resource = TransactionSynchronizationManager.getResource(sessionFactory);
+        if (resource instanceof Session) &#123;
+            return (Session) resource;
+        &#125;
+        SessionHolder sessionHolder = (SessionHolder) resource;
+        if (sessionHolder != null &amp;&amp; !sessionHolder.isEmpty()) &#123;
+            // pre-bound Hibernate Session
+            Session session = null;
+            if (TransactionSynchronizationManager.isSynchronizationActive() &amp;&amp;
+                    sessionHolder.doesNotHoldNonDefaultSession()) &#123;
+                // Spring transaction management is active -&gt;
+                // register pre-bound Session with it for transactional flushing.
+                session = sessionHolder.getValidatedSession();
+                if (session != null &amp;&amp; !sessionHolder.isSynchronizedWithTransaction()) &#123;
+                    logger.debug(&quot;Registering Spring transaction synchronization for existing Hibernate Session&quot;);
+                    TransactionSynchronizationManager.registerSynchronization(
+                            new SpringSessionSynchronization(sessionHolder, sessionFactory, jdbcExceptionTranslator, false));
+                    sessionHolder.setSynchronizedWithTransaction(true);
+                    // Switch to FlushMode.AUTO, as we have to assume a thread-bound Session
+                    // with FlushMode.MANUAL, which needs to allow flushing within the transaction.
+                    FlushMode flushMode = session.getFlushMode();
+                    if (flushMode.lessThan(FlushMode.COMMIT) &amp;&amp;
+                            !TransactionSynchronizationManager.isCurrentTransactionReadOnly()) &#123;
+                        session.setFlushMode(FlushMode.AUTO);
+                        sessionHolder.setPreviousFlushMode(flushMode);
+                    &#125;
+                &#125;
+            &#125;
+            else &#123;
+                // No Spring transaction management active -&gt; try JTA transaction synchronization.
+                session = getJtaSynchronizedSession(sessionHolder, sessionFactory, jdbcExceptionTranslator);
+            &#125;
+            if (session != null) &#123;
+                return session;
+            &#125;
+        &#125;
+
+        logger.debug(&quot;Opening Hibernate Session&quot;);
+        Session session = (entityInterceptor != null ?
+                sessionFactory.openSession(entityInterceptor) : sessionFactory.openSession());
+
+        // Use same Session for further Hibernate actions within the transaction.
+        // Thread object will get removed by synchronization at transaction completion.
+        if (TransactionSynchronizationManager.isSynchronizationActive()) &#123;
+            // We&#39;re within a Spring-managed transaction, possibly from JtaTransactionManager.
+            logger.debug(&quot;Registering Spring transaction synchronization for new Hibernate Session&quot;);
+            SessionHolder holderToUse = sessionHolder;
+            if (holderToUse == null) &#123;
+                holderToUse = new SessionHolder(session);
+            &#125;
+            else &#123;
+                holderToUse.addSession(session);
+            &#125;
+            if (TransactionSynchronizationManager.isCurrentTransactionReadOnly()) &#123;
+                session.setFlushMode(FlushMode.MANUAL);
+            &#125;
+            TransactionSynchronizationManager.registerSynchronization(
+                    new SpringSessionSynchronization(holderToUse, sessionFactory, jdbcExceptionTranslator, true));
+            holderToUse.setSynchronizedWithTransaction(true);
+            if (holderToUse != sessionHolder) &#123;
+                TransactionSynchronizationManager.bindResource(sessionFactory, holderToUse);
+            &#125;
+        &#125;
+        else &#123;
+            // No Spring transaction management active -&gt; try JTA transaction synchronization.
+            registerJtaSynchronization(session, sessionFactory, jdbcExceptionTranslator, sessionHolder);
+        &#125;
+
+        // Check whether we are allowed to return the Session.
+        if (!allowCreate &amp;&amp; !isSessionTransactional(session, sessionFactory)) &#123;
+            closeSession(session);
+            throw new IllegalStateException(&quot;No Hibernate Session bound to thread, &quot; +
+                &quot;and configuration does not allow creation of non-transactional one here&quot;);
+        &#125;
+
+        return session;
+&#125;
+</code></pre>
+<p>这段代码比较长，主要逻辑如下：</p>
+<p>如果ThreadLocal中有sessionHolder，说明前面已经在ThreadLocal中绑定过了session，直接从sessionHolder中取出sesision即可，不需要重新开启一个新的session，而是沿用之前绑定到ThreadLocal中的sessoin。如果ThreadLocal中没有sessionHolder，说明没有绑定sesison，就通过<br>SessionFactoryUtils开启一个新的session，得到这个session之后再判断当前是否存在spring事务，如果有就绑定到ThreadLocal中，之后在这个事务范围内的dao操作都共用这个session，如果没有事务，就直接返回这个session。</p>
+<p>回过头去看OpenSessionInViewFilter 在单session的情况下，通过getSession方法获取到session之后，就执行bindResource方法将session绑定到ThreadLocal中了：</p>
+<pre><code class="java">TransactionSynchronizationManager.bindResource(sessionFactory, new SessionHolder(session));
+</code></pre>
+<p>到此就可以得出几个小结论：</p>
+<ul>
+<li><p>单sessoin情况下，请求一开始就会创建session并绑定到ThreadLocal变量中，请求过程中需要用到hibernate的sesison进行数据库操作的时候，就直接从ThreadLocal变量中取出复用，请求结束了就关闭这个唯一的session，整个请求过程也只会占用一个数据库链接。</p>
+</li>
+<li><p>多session的情况下，请求刚开始并不创建session，而是等到请求过程中需要session的时候就open一个session，执行多个HibernateTemplate的增删改查方法就会创建多个session，请求过程中将会占用多个数据库链接，并直到请求结束链接才会被释放。</p>
+</li>
+</ul>
+<p>然后接着看HibernateTemplate的增删改查代码对session的处理情况，举个save方法的例子：</p>
+<h3 id="save"><a href="#save" class="headerlink" title="save"></a>save</h3><pre><code class="java">public Serializable save(final Object entity) throws DataAccessException &#123;
+        return executeWithNativeSession(new HibernateCallback&lt;Serializable&gt;() &#123;
+            public Serializable doInHibernate(Session session) throws HibernateException &#123;
+                checkWriteOperationAllowed(session);
+                return session.save(entity);
+            &#125;
+        &#125;);
+&#125;
+</code></pre>
+<p>增删改查都会调用executeWithNativeSession方法，并传入一个HibernateCallback实例，执行相应的增删改查操作。executeWithNativeSession方法属于设计模式中的命令模式，简单来说就是往这个方法传入什么命令，hibernate就帮你执行什么操作。继续往里面跟踪代码可以看到：</p>
+<h3 id="doExecute"><a href="#doExecute" class="headerlink" title="doExecute"></a>doExecute</h3><pre><code class="java">public &lt;T&gt; T executeWithNativeSession(HibernateCallback&lt;T&gt; action) &#123;
+        return doExecute(action, false, true);
+&#125;
+
+protected &lt;T&gt; T doExecute(HibernateCallback&lt;T&gt; action, boolean enforceNewSession, boolean enforceNativeSession)
+            throws DataAccessException &#123;
+
+        Assert.notNull(action, &quot;Callback object must not be null&quot;);
+
+        Session session = (enforceNewSession ?
+                SessionFactoryUtils.getNewSession(getSessionFactory(), getEntityInterceptor()) : getSession());
+        boolean existingTransaction = (!enforceNewSession &amp;&amp;
+                (!isAllowCreate() || SessionFactoryUtils.isSessionTransactional(session, getSessionFactory())));
+        if (existingTransaction) &#123;
+            logger.debug(&quot;Found thread-bound Session for HibernateTemplate&quot;);
+        &#125;
+
+        FlushMode previousFlushMode = null;
+        try &#123;
+            previousFlushMode = applyFlushMode(session, existingTransaction);
+            enableFilters(session);
+            Session sessionToExpose =
+                    (enforceNativeSession || isExposeNativeSession() ? session : createSessionProxy(session));
+            T result = action.doInHibernate(sessionToExpose);
+            flushIfNecessary(session, existingTransaction);
+            return result;
+        &#125;
+        catch (HibernateException ex) &#123;
+            throw convertHibernateAccessException(ex);
+        &#125;
+        catch (SQLException ex) &#123;
+            throw convertJdbcAccessException(ex);
+        &#125;
+        catch (RuntimeException ex) &#123;
+            // Callback code threw application exception...
+            throw ex;
+        &#125;
+        finally &#123;
+            if (existingTransaction) &#123;
+                logger.debug(&quot;Not closing pre-bound Hibernate Session after HibernateTemplate&quot;);
+                disableFilters(session);
+                if (previousFlushMode != null) &#123;
+                    session.setFlushMode(previousFlushMode);
+                &#125;
+            &#125;
+            else &#123;
+                // Never use deferred close for an explicitly new Session.
+                if (isAlwaysUseNewSession()) &#123;
+                    SessionFactoryUtils.closeSession(session);
+                &#125;
+                else &#123;
+                    SessionFactoryUtils.closeSessionOrRegisterDeferredClose(session, getSessionFactory());
+                &#125;
+            &#125;
+        &#125;
+&#125;
+</code></pre>
+<p>这个方法就比较明了了：<br>首先获取hibernate的session，就是上面分析过的那个方法。然后判断existingTransaction，也就是当前是否存在spring事务。可以看到previousFlushMode = applyFlushMode(session, existingTransaction)，这行代码，如果当前存在事务，就会修改session的flushMode，并取得修改之前的previousFlushMode，执行增删改查操作之后再把这个previousFlushMode，也就是旧的flushMode设置回session中，这也就是为什么在单session情况下，有spring事务的可以执行增删改操作，而没有spring事务执行增删改就会报错的原因。</p>
+<p>中间的：</p>
+<pre><code class="java">T result = action.doInHibernate(sessionToExpose);
+</code></pre>
+<p>此处就是执行的增删改操作，以及返回操作结果。hinernate创建session的时候并不会占用数据库链接，只有hibernate真正执行与数据库交互的时候才会申请并占用数据库链接。在执行action.doInHibernate的时候hibernate其实还没有开始真正的进行数据库操作，只是在内存中操作，只有执行session.flush()的时候才会把内存中的这些数据真正的同步到数据库中，也就是执行session.flush()的时候才会开始占用数据库链接。当然查询方法是个例外，因为必须要从数据库中取出数据，所以如果是查询方法，在查询的时候就会与数据库有交互操作，也就是进行查询的时候就会开始占用数据库链接。接下来的代码就是判断是否要进行flush操作，继续跟踪到flushIfNecessary这个方法中：</p>
+<h3 id="flushIfNecessary"><a href="#flushIfNecessary" class="headerlink" title="flushIfNecessary"></a>flushIfNecessary</h3><pre><code class="java">protected void flushIfNecessary(Session session, boolean existingTransaction) throws HibernateException &#123;
+        if (getFlushMode() == FLUSH_EAGER || (!existingTransaction &amp;&amp; getFlushMode() != FLUSH_NEVER)) &#123;
+            logger.debug(&quot;Eagerly flushing Hibernate session&quot;);
+            session.flush();
+        &#125;
+&#125;
+</code></pre>
+<p>可以看到，当flushMode为FLUSH_EAGER的时候，或者不存在spring事务且flushMode不为FLUSH_NEVER的时候就会进行session.flush()操作，同步数据。综上可见在存在spring事务的情况下，所有dao的增删改操作都不会马上被同步到数据库中，而要等到事务提交才会被flush到数据库。所有如果你在某个带有spring事务的service方法内部对dao执行try catch会出现捕获不到数据库异常的情况：</p>
+<pre><code class="java">public calss Service｛
+    public void saveObj()&#123;
+        try&#123;
+            dao.save(dto);
+        &#125;catch(Exception e)&#123;
+           //这里catch不到数据库错误
+        &#125;
+    &#125;
+｝
+
+public calss Action｛
+    public void saveSomeThing()&#123;
+        try&#123;
+            service.saveObj(dto);
+        &#125;catch(Exception e)&#123;
+           //这里才能catch到数据库错误
+        &#125;
+    &#125;
+｝
+</code></pre>
+<p>执行完增删改查之后，如果当前有spring事务就把flushMode设置为原来的状态：session.setFlushMode(previousFlushMode)。如果当前没有spring事务,会看到以下方法：</p>
+<p>SessionFactoryUtils.closeSessionOrRegisterDeferredClose(session, getSessionFactory());</p>
+<h3 id="closeSessionOrRegisterDeferredClose"><a href="#closeSessionOrRegisterDeferredClose" class="headerlink" title="closeSessionOrRegisterDeferredClose"></a>closeSessionOrRegisterDeferredClose</h3><pre><code class="java">static void closeSessionOrRegisterDeferredClose(Session session, SessionFactory sessionFactory) &#123;
+        Map&lt;SessionFactory, Set&lt;Session&gt;&gt; holderMap = deferredCloseHolder.get();
+        if (holderMap != null &amp;&amp; sessionFactory != null &amp;&amp; holderMap.containsKey(sessionFactory)) &#123;
+            logger.debug(&quot;Registering Hibernate Session for deferred close&quot;);
+            // Switch Session to FlushMode.MANUAL for remaining lifetime.
+            session.setFlushMode(FlushMode.MANUAL);
+            Set&lt;Session&gt; sessions = holderMap.get(sessionFactory);
+            sessions.add(session);
+        &#125;
+        else &#123;
+            closeSession(session);
+        &#125;
+&#125;
+</code></pre>
+<p>从这个方法就可以很清晰的看出在OpenSessionInViewFilter多session的情况下，只要deferredCloseHolder有holderMap，session就不会被关闭，而是被保存到Set<Session>集合中，也就是多session情况下数据库链接在请求结束之前都不会被释放的原因。</p>
+<p>最后是Transactioninterceptor拦截器，入口方法如下：</p>
+<pre><code class="java">public Object invoke(final MethodInvocation invocation) throws Throwable &#123;
+        Class&lt;?&gt; targetClass = (invocation.getThis() != null ? AopUtils.getTargetClass(invocation.getThis()) : null);
+        final TransactionAttribute txAttr =
+                getTransactionAttributeSource().getTransactionAttribute(invocation.getMethod(), targetClass);
+        final PlatformTransactionManager tm = determineTransactionManager(txAttr);
+        final String joinpointIdentification = methodIdentification(invocation.getMethod(), targetClass);
+        if (txAttr == null || !(tm instanceof CallbackPreferringPlatformTransactionManager)) &#123;
+            TransactionInfo txInfo = createTransactionIfNecessary(tm, txAttr, joinpointIdentification);
+            Object retVal = null;
+            try &#123;
+                retVal = invocation.proceed();
+            &#125;
+            catch (Throwable ex) &#123;
+                // target invocation exception
+                completeTransactionAfterThrowing(txInfo, ex);
+                throw ex;
+            &#125;
+            finally &#123;
+                cleanupTransactionInfo(txInfo);
+            &#125;
+            commitTransactionAfterReturning(txInfo);
+            return retVal;
+        &#125;
+        //此处省略n行代码......
+&#125;
+</code></pre>
+<p>retVal = invocation.proceed()<br>这行代码是执行拦截器链中的其他拦截器以及被拦截的目标方法。这个方法前面的内容就是开启事务，后面的内容就是提交和回滚事务。也就是spring声明式事务可以不用手动开启和提交事务的原理。createTransactionIfNecessary这个方法就是根据applicationcontext.xml的配置来生成不同类型的事务，而commitTransactionAfterReturning就是提交事务。</p>
+<p>跟踪createTransactionIfNecessary进入到getTransaction方法：</p>
+<h3 id="getTransaction"><a href="#getTransaction" class="headerlink" title="getTransaction"></a>getTransaction</h3><pre><code class="java">public final TransactionStatus getTransaction(TransactionDefinition definition) throws TransactionException &#123;
+        Object transaction = doGetTransaction();
+
+        // Cache debug flag to avoid repeated checks.
+        boolean debugEnabled = logger.isDebugEnabled();
+
+        if (definition == null) &#123;
+            // Use defaults if no transaction definition given.
+            definition = new DefaultTransactionDefinition();
+        &#125;
+
+        if (isExistingTransaction(transaction)) &#123;
+            // Existing transaction found -&gt; check propagation behavior to find out how to behave.
+            return handleExistingTransaction(definition, transaction, debugEnabled);
+        &#125;
+
+        // Check definition settings for new transaction.
+        if (definition.getTimeout() &lt; TransactionDefinition.TIMEOUT_DEFAULT) &#123;
+            throw new InvalidTimeoutException(&quot;Invalid transaction timeout&quot;, definition.getTimeout());
+        &#125;
+
+        // No existing transaction found -&gt; check propagation behavior to find out how to proceed.
+        if (definition.getPropagationBehavior() == TransactionDefinition.PROPAGATION_MANDATORY) &#123;
+            throw new IllegalTransactionStateException(
+                    &quot;No existing transaction found for transaction marked with propagation &#39;mandatory&#39;&quot;);
+        &#125;
+        else if (definition.getPropagationBehavior() == TransactionDefinition.PROPAGATION_REQUIRED ||
+                definition.getPropagationBehavior() == TransactionDefinition.PROPAGATION_REQUIRES_NEW ||
+            definition.getPropagationBehavior() == TransactionDefinition.PROPAGATION_NESTED) &#123;
+            SuspendedResourcesHolder suspendedResources = suspend(null);
+            if (debugEnabled) &#123;
+                logger.debug(&quot;Creating new transaction with name [&quot; + definition.getName() + &quot;]: &quot; + definition);
+            &#125;
+            try &#123;
+                boolean newSynchronization = (getTransactionSynchronization() != SYNCHRONIZATION_NEVER);
+                DefaultTransactionStatus status = newTransactionStatus(
+                        definition, transaction, true, newSynchronization, debugEnabled, suspendedResources);
+                doBegin(transaction, definition);
+                prepareSynchronization(status, definition);
+                return status;
+            &#125;
+            catch (RuntimeException ex) &#123;
+                resume(null, suspendedResources);
+                throw ex;
+            &#125;
+            catch (Error err) &#123;
+                resume(null, suspendedResources);
+                throw err;
+            &#125;
+        &#125;
+        else &#123;
+            // Create &quot;empty&quot; transaction: no actual transaction, but potentially synchronization.
+            boolean newSynchronization = (getTransactionSynchronization() == SYNCHRONIZATION_ALWAYS);
+            return prepareTransactionStatus(definition, null, true, newSynchronization, debugEnabled, null);
+        &#125;
+&#125;
+</code></pre>
+<p>由于spring提供了多种事务嵌套的传播机制，所以这段代码里面有许多if else的判断，开启事务在doBegin这个方法里面。这里需要注意最后那个else分支：创建一个空的事务，并非真正的数据库事务，也就是不执行session.begintransaction()这个开启事务的方法。spring事务传播有个配置叫PROPAGATION_NOT_SUPPORTED：意思是以非事务方式执行操作，如果当前存在事务，就把当前事务挂起。PROPAGATION_NOT_SUPPORTED这个配置就会走到最后的这个else分支。虽然以非事务方式运行，但是在前面分析的许多用来判断当前是否存在spring事务的existingTransaction这个变量的值依旧会是ture。也就是说，spring认为当前存在事务，虽然是一个空事务。这就导致可能出现下面的情况：</p>
+<ul>
+<li>在某个service中配置为PROPAGATION_NOT_SUPPORTED的方法中开始执行了查数据库的操作，占用了一个数据库链接，然后又把查询出来的数据作为参数调用了一个耗时很长的外围系统的接口,这样就会导致这个空事务一直不被提交，这个数据库链接也就会被一直被占用而无法释放。</li>
+</ul>
+<p>继续看开启事务的doBegin方法：</p>
+<h3 id="doBegin"><a href="#doBegin" class="headerlink" title="doBegin"></a>doBegin</h3><pre><code class="java">@Override
+    protected void doBegin(Object transaction, TransactionDefinition definition) &#123;
+        //此处省略n行代码......
+        hibTx = session.beginTransaction();
+        //此处省略n行代码......
+&#125;
+</code></pre>
+<p>执行完目标方法，中间有一个准备提交事务的方法：</p>
+<h3 id="prepareForCommit"><a href="#prepareForCommit" class="headerlink" title="prepareForCommit"></a>prepareForCommit</h3><pre><code class="java">protected void prepareForCommit(DefaultTransactionStatus status) &#123;
+        if (this.earlyFlushBeforeCommit &amp;&amp; status.isNewTransaction()) &#123;
+            HibernateTransactionObject txObject = (HibernateTransactionObject) status.getTransaction();
+            Session session = txObject.getSessionHolder().getSession();
+            if (!session.getFlushMode().lessThan(FlushMode.COMMIT)) &#123;
+                logger.debug(&quot;Performing an early flush for Hibernate transaction&quot;);
+                try &#123;
+                    session.flush();
+                &#125;
+                catch (HibernateException ex) &#123;
+                    throw convertHibernateAccessException(ex);
+                &#125;
+                finally &#123;
+                    session.setFlushMode(FlushMode.MANUAL);
+                &#125;
+            &#125;
+        &#125;
+&#125;
+</code></pre>
+<p>这里可以看到 session.flush()方法，也就是前面说的事务开始提交的时候才会把hibernate内存中的数据同步到数据库之中。</p>
+<p>最后就是事务提交完成之后的处理session.disconnect()或者session.close()释放数据库链接，如下：</p>
+<h3 id="doCleanupAfterCompletion"><a href="#doCleanupAfterCompletion" class="headerlink" title="doCleanupAfterCompletion"></a>doCleanupAfterCompletion</h3><pre><code class="java">protected void doCleanupAfterCompletion(Object transaction) &#123;
+        HibernateTransactionObject txObject = (HibernateTransactionObject) transaction;
+
+        // Remove the session holder from the thread.
+        if (txObject.isNewSessionHolder()) &#123;
+            TransactionSynchronizationManager.unbindResource(getSessionFactory());
+        &#125;
+
+        // Remove the JDBC connection holder from the thread, if exposed.
+        if (getDataSource() != null) &#123;
+            TransactionSynchronizationManager.unbindResource(getDataSource());
+        &#125;
+
+        Session session = txObject.getSessionHolder().getSession();
+        if (this.prepareConnection &amp;&amp; session.isConnected() &amp;&amp; isSameConnectionForEntireSession(session)) &#123;
+            // We&#39;re running with connection release mode &quot;on_close&quot;: We&#39;re able to reset
+            // the isolation level and/or read-only flag of the JDBC Connection here.
+            // Else, we need to rely on the connection pool to perform proper cleanup.
+            try &#123;
+                Connection con = session.connection();
+                DataSourceUtils.resetConnectionAfterTransaction(con, txObject.getPreviousIsolationLevel());
+            &#125;
+            catch (HibernateException ex) &#123;
+                logger.debug(&quot;Could not access JDBC Connection of Hibernate Session&quot;, ex);
+            &#125;
+        &#125;
+
+        if (txObject.isNewSession()) &#123;
+            if (logger.isDebugEnabled()) &#123;
+                logger.debug(&quot;Closing Hibernate Session [&quot; + SessionFactoryUtils.toString(session) +
+                        &quot;] after transaction&quot;);
+            &#125;
+            SessionFactoryUtils.closeSessionOrRegisterDeferredClose(session, getSessionFactory());
+        &#125;
+        else &#123;
+            if (logger.isDebugEnabled()) &#123;
+                logger.debug(&quot;Not closing pre-bound Hibernate Session [&quot; +
+                        SessionFactoryUtils.toString(session) + &quot;] after transaction&quot;);
+            &#125;
+            if (txObject.getSessionHolder().getPreviousFlushMode() != null) &#123;
+                session.setFlushMode(txObject.getSessionHolder().getPreviousFlushMode());
+            &#125;
+            if (!this.hibernateManagedSession) &#123;
+                session.disconnect();
+            &#125;
+        &#125;
+        txObject.getSessionHolder().clear();
+&#125;
+</code></pre>
+<ul>
+<li>多session的情况下，如果没有嵌套事务,txObject.isNewSessionHolder()和txObject.isNewSession()的返回值为true，会执行unbindResource操作和closeSessionOrRegisterDeferredClose操作。</li>
+<li>单session情况下不解除绑定，后面依然可以从ThreadLocal中获取到session，但是会执行session.disconnect()来关闭数据库链接。</li>
+</ul>
+<p>下面给出各种情况下的结论：</p>
+<ol>
+<li><p>在单session情况下，session会被绑定至当前线程(ThreadLocal)，整个请求过程中共用一个sesssion，整个请求过程至多一个数据库连接。如果执行带有spring事务的service方法结束之后会触发session.disconnect()释放连接。虽然只有一个连接，但如果在service内部方法结束之前调用了外围耗时的操作会导致连接长时间不被释放。</p>
+</li>
+<li><p>多session情况下，每执行一个dao或者service方法都将创建一个session，每个session都将占用一个数据库连接，dao和service方法结束都不会关闭session，直到请求结束才会释放连接。service内部的所有dao操作共用一个sesison。如果在for循环中调用dao或者service，将产生n个连接。所以，这种模式下一次请求将占用n个连接，将会导致数据库连接瞬间飙升的情况。</p>
+</li>
+<li><p>后台自启线程，如quartz定时调度等不经过OpenSessionInViewFilter的情况下，每执行一个dao或者service方法都将创建一个session，执行结束之后都会关闭sessoin。service内部的所有dao操作共用一个sesison。所以即使在for循环里面调用dao或者service，同一时刻也只会占用一个数据库连接，不会导致数据库连接飙升的情况。</p>
+</li>
+<li><p>创建hibernate的sessoin的时候并不占用数据库连接，执行查询方法或者session的flush方法才会开始占用数据库连接。spring事务开启的时候，由于需要调用jdbc底层的Connection.setAutoCommit方法，所以spring事务开启的时候，即使中间没有执行任何数据库操作，也会占用数据库连接。如果service方法的propagation为PROPAGATION_NOT_SUPPORTED，虽有spring事务(空事务)，但是由于不会创建JDBC底层事务，所以这类的service方法开始的时候不会占用数据库连接。</p>
+</li>
+</ol>
+
+    </div>
+  </section>
+
+  
+  
+</article>
+      <script>NProgress.set(0.6);</script>
+    </main>
+    
+    <!-- <footer class="footer">
+  <div class="footer-wrap">
+    <div class="footer-link">
+      
+      <h3>LINKS</h3>
+      <p>
+        
+          <a href="http://1x0.xyz/" target="_blank">Tian1x0</a>
+        
+          <a href="http://www.royalmice.com/hankzhou/" target="_blank">Hankzhou</a>
+        
+          <a href="http://sjydh.me/" target="_blank">设计有点货</a>
+        
+          <a href="https://developers.google.com/web/fundamentals/" target="_blank">Web fundamentals</a>
+        
+      </p>
+      
+    </div>
+    <div class="footer-tags">
+      
+    </div>
+    <div class="footer-info">
+        <div>Theme <span class="codename"><a href="https://github.com/GGICE/hexo-icer" target="_blank">icer</a></span> designed & coded by <a href="https://ice.gs/" target="_blank">GGICE</a></div>
+        <div>Copyright &copy; 2026, <a href="/">超级大馒头</a>  . All rights reserved .</div>
+      </div>
+  </div>
+</footer>
+ -->
+
+    <script>NProgress.set(0.8);</script>
+    
+  </div>
+
+  <script src="/js/highlight.min.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+
+<script src="/js/main.js"></script>
+
+
+<!-- Commit -->
+
+
+
+  <script>
+    NProgress.done();
+  </script>
+  
+</body>
+</html>

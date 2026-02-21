@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  
+  <title>基于Redis的分布式锁 | 超级大馒头</title>
+  <meta name="description" content="A amazing blog." />
+  <meta name="keywords" content="hexo,theme,mantou,plus" />
+  <meta name="HandheldFriendly" content="True" />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="在集群多机器环境中，为了避免并发导致的冲突问题，就会使用到分布式锁，同一时刻，集群中只有获取到锁的节点能够执行处逻辑，如下： import org.springframework.beans.factory.annotation.Autowired; import org.springframework.stereotype.Service; import redis.clients.jedis.">
+<meta property="og:type" content="article">
+<meta property="og:title" content="基于Redis的分布式锁">
+<meta property="og:url" content="http://example.com/2021/05/18/%E5%9F%BA%E4%BA%8ERedis%E7%9A%84%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81/index.html">
+<meta property="og:site_name" content="超级大馒头">
+<meta property="og:description" content="在集群多机器环境中，为了避免并发导致的冲突问题，就会使用到分布式锁，同一时刻，集群中只有获取到锁的节点能够执行处逻辑，如下： import org.springframework.beans.factory.annotation.Autowired; import org.springframework.stereotype.Service; import redis.clients.jedis.">
+<meta property="og:locale">
+<meta property="article:published_time" content="2021-05-17T16:00:00.000Z">
+<meta property="article:modified_time" content="2023-02-25T11:52:34.000Z">
+<meta property="article:author" content="weixiaojie">
+<meta name="twitter:card" content="summary">
+  
+  
+    <link rel="icon" href="/image/favicon.ico">
+  
+
+  <link rel='stylesheet' href='/css/nprogress.css'/>
+  <link rel="stylesheet" href="/css/github-gist.min.css">
+  <link rel="stylesheet" href="/css/font_405585_yuudmyqpo3q.css">
+  <script src='/js/nprogress.min.js'></script>
+  <!-- <script>try{Typekit.load({ async: false });}catch(e){}</script> -->
+  
+<link rel="stylesheet" href="/style.css">
+
+  
+
+  
+
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+<body>
+  
+  <script>NProgress.start();</script>
+  
+  <div id="site-wrapper">
+    
+    <header class="header">
+  <div class="header-wrapper">
+    <a href="/">
+      <img src="/image/logo.jpg" class="logo"/>
+      <!-- <span class="site-desc">
+        
+      </span> -->
+    </a>
+    <div class="social-wrapper">
+      
+        
+          <a href="https://github.com/weixiaojie" class="social github" target="_blank" rel="external">
+            <span class="iconfont icon-github"></span>
+          </a>
+          
+          <a href="https://weibo.com/u/2156965395" class="social weibo" target="_blank" rel="external">
+            <span class="iconfont icon-weibo"></span>
+          </a>
+          
+          <a href="mailto:18565765503@163.com" class="social email" target="_blank" rel="external">
+            <span class="iconfont icon-email"></span>
+          </a>
+          
+      
+      
+      <a href="#" class="social search-do" target="_blank" rel="external">
+        <span class="iconfont icon-search"></span>
+      </a>
+            
+      <!-- <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><input type="hidden" name="sitesearch" value="http://example.com"></form> -->
+    </div>
+    <div class="search-wrap">
+      <div class="search-content animated fade-in">
+        <p class="search-input">
+          <span class="iconfont icon-search"></span>
+          <input tabindex="1">
+        </p>
+        <ul class="search-result">
+            
+        </ul>
+      </div>
+    </div>
+    <nav class="header-nav">
+      
+        <a href="/" class="archives">
+          首页
+        </a>
+        
+        <a href="/archives" class="archives">
+          归档
+        </a>
+        
+    </nav>
+  </div>
+</header>
+    <script>NProgress.set(0.4);</script>
+    
+    <main id="main" role="main">
+      <article id="post-基于Redis的分布式锁"
+  class="post article white-box article-type-post animated fade-in-top"
+  itemscope itemprop="blogPost">
+  <section class="post-header article-header">
+    <h2 class="title">
+        <a href="/2021/05/18/%E5%9F%BA%E4%BA%8ERedis%E7%9A%84%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81/">
+          基于Redis的分布式锁
+        </a>
+      </h2>
+      <div class="subtitle">
+          <time>
+            2021年05月18日
+          </time>
+          
+      </div>
+  </section>
+  <section class="content">
+    <div class="article-entry" itemprop="articleBody">
+      <p>在集群多机器环境中，为了避免并发导致的冲突问题，就会使用到分布式锁，同一时刻，集群中只有获取到锁的节点能够执行处逻辑，如下：</p>
+<pre><code class="java">import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import redis.clients.jedis.Jedis;
+import redis.clients.jedis.JedisPool;
+
+import java.util.Collections;
+
+@Service(&quot;RedisSevice&quot;)
+public class RedisSevice &#123;
+
+    @Autowired
+    JedisPool jedisPool;
+
+    private static final String LOCK_SUCCESS = &quot;OK&quot;;
+    
+    //如果不存在key值就存入redis，如果存在返回失败，过期自动删除
+    private static final String SET_IF_NOT_EXIST = &quot;NX&quot;;
+    
+    private static final String SET_WITH_EXPIRE_TIME = &quot;PX&quot;;
+
+    public boolean tryGetDistributedLock(String lockKey, String value, int expireTime) &#123;
+        Jedis jedis = jedisPool.getResource();
+        //往redis写入key及value，如果key存在返回写入失败表示获取锁失败，key不存在返回写入成功表示获取锁成功
+        String result = jedis.set(lockKey, value, SET_IF_NOT_EXIST, SET_WITH_EXPIRE_TIME, expireTime);
+
+        if (LOCK_SUCCESS.equals(result)) &#123;
+            return true;
+        &#125;
+        return false;
+    &#125;
+
+    private static final Long RELEASE_SUCCESS = 1L;
+
+    public boolean releaseDistributedLock(String lockKey, String value) &#123;
+        Jedis jedis = jedisPool.getResource();
+        /*当A节点获取锁之后执行过久，导致锁过期自动释放，B节点获取到了锁执行逻辑中，
+        这时A执行完毕准备释放锁，如果发现value不是自己设置的，说明当前锁已经不是自己持有，则不能释放*/
+        String script = &quot;if redis.call(&#39;get&#39;, KEYS[1]) == ARGV[1] then return redis.call(&#39;del&#39;, KEYS[1]) else return 0 end&quot;;
+        Object result = jedis.eval(script, Collections.singletonList(lockKey), Collections.singletonList(value));
+
+        if (RELEASE_SUCCESS.equals(result)) &#123;
+            return true;
+        &#125;
+        return false;
+    &#125;
+
+&#125;
+</code></pre>
+<pre><code>@Component
+public class DistributedLock&#123;
+
+    @Autowired
+    RedisSevice redisSevice;
+    
+    //redis分布式锁key过期时间，防止执行时间过久或者宕机等异常原因导致锁无法释放
+    private static final int EXPIRE_TIME = 30000;
+    
+    public void main(String[] args) &#123;
+        String lockKey = &quot;key值&quot;;
+        String lockValue = &quot;value值，可用集群机器IP表明锁的持有者&quot;;
+        boolean lockable = redisSevice.tryGetDistributedLock(lockKey, lockValue, EXPIRE_TIME);
+        if (lockable) &#123;
+            try &#123;
+                //获取到锁，执行业务逻辑
+            &#125; finally &#123;
+                //执行结束释放锁
+                redisSevice.releaseDistributedLock(lockKey, value);
+            &#125;
+        &#125;
+    &#125;
+    
+&#125;
+</code></pre>
+<p>上述情况主要适用于单机redis，如果是集群，master数据未同步到salve节点时宕机，会导致锁丢失的问题，推荐使用Redisson分布式锁。</p>
+
+    </div>
+  </section>
+
+  
+  
+</article>
+      <script>NProgress.set(0.6);</script>
+    </main>
+    
+    <!-- <footer class="footer">
+  <div class="footer-wrap">
+    <div class="footer-link">
+      
+      <h3>LINKS</h3>
+      <p>
+        
+          <a href="http://1x0.xyz/" target="_blank">Tian1x0</a>
+        
+          <a href="http://www.royalmice.com/hankzhou/" target="_blank">Hankzhou</a>
+        
+          <a href="http://sjydh.me/" target="_blank">设计有点货</a>
+        
+          <a href="https://developers.google.com/web/fundamentals/" target="_blank">Web fundamentals</a>
+        
+      </p>
+      
+    </div>
+    <div class="footer-tags">
+      
+    </div>
+    <div class="footer-info">
+        <div>Theme <span class="codename"><a href="https://github.com/GGICE/hexo-icer" target="_blank">icer</a></span> designed & coded by <a href="https://ice.gs/" target="_blank">GGICE</a></div>
+        <div>Copyright &copy; 2026, <a href="/">超级大馒头</a>  . All rights reserved .</div>
+      </div>
+  </div>
+</footer>
+ -->
+
+    <script>NProgress.set(0.8);</script>
+    
+  </div>
+
+  <script src="/js/highlight.min.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+
+<script src="/js/main.js"></script>
+
+
+<!-- Commit -->
+
+
+
+  <script>
+    NProgress.done();
+  </script>
+  
+</body>
+</html>

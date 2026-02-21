@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  
+  <title>网关gateway搭建 | 超级大馒头</title>
+  <meta name="description" content="A amazing blog." />
+  <meta name="keywords" content="hexo,theme,mantou,plus" />
+  <meta name="HandheldFriendly" content="True" />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="为什么需要网关  为什么选择Spring cloud Gateway 常见的网关有gateway和zuul，和zuul相比，Spring Cloud Gateway具有如下优势：  基于Reactor模型的WebFlux构建，运行在Netty上，具有更好的性能。 可拓展性高，内置了非常丰富的断言及过滤器等，除此之外，我们也可以定义自己的断言和过滤器。  搭建gateway pom依赖配置： &amp;lt">
+<meta property="og:type" content="article">
+<meta property="og:title" content="网关gateway搭建">
+<meta property="og:url" content="http://example.com/2023/03/08/SpringCloudGateway%E6%90%AD%E5%BB%BA/index.html">
+<meta property="og:site_name" content="超级大馒头">
+<meta property="og:description" content="为什么需要网关  为什么选择Spring cloud Gateway 常见的网关有gateway和zuul，和zuul相比，Spring Cloud Gateway具有如下优势：  基于Reactor模型的WebFlux构建，运行在Netty上，具有更好的性能。 可拓展性高，内置了非常丰富的断言及过滤器等，除此之外，我们也可以定义自己的断言和过滤器。  搭建gateway pom依赖配置： &amp;lt">
+<meta property="og:locale">
+<meta property="og:image" content="http://example.com/image/14.png">
+<meta property="article:published_time" content="2023-03-07T16:00:00.000Z">
+<meta property="article:modified_time" content="2023-03-19T11:30:34.000Z">
+<meta property="article:author" content="weixiaojie">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/image/14.png">
+  
+  
+    <link rel="icon" href="/image/favicon.ico">
+  
+
+  <link rel='stylesheet' href='/css/nprogress.css'/>
+  <link rel="stylesheet" href="/css/github-gist.min.css">
+  <link rel="stylesheet" href="/css/font_405585_yuudmyqpo3q.css">
+  <script src='/js/nprogress.min.js'></script>
+  <!-- <script>try{Typekit.load({ async: false });}catch(e){}</script> -->
+  
+<link rel="stylesheet" href="/style.css">
+
+  
+
+  
+
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+<body>
+  
+  <script>NProgress.start();</script>
+  
+  <div id="site-wrapper">
+    
+    <header class="header">
+  <div class="header-wrapper">
+    <a href="/">
+      <img src="/image/logo.jpg" class="logo"/>
+      <!-- <span class="site-desc">
+        
+      </span> -->
+    </a>
+    <div class="social-wrapper">
+      
+        
+          <a href="https://github.com/weixiaojie" class="social github" target="_blank" rel="external">
+            <span class="iconfont icon-github"></span>
+          </a>
+          
+          <a href="https://weibo.com/u/2156965395" class="social weibo" target="_blank" rel="external">
+            <span class="iconfont icon-weibo"></span>
+          </a>
+          
+          <a href="mailto:18565765503@163.com" class="social email" target="_blank" rel="external">
+            <span class="iconfont icon-email"></span>
+          </a>
+          
+      
+      
+      <a href="#" class="social search-do" target="_blank" rel="external">
+        <span class="iconfont icon-search"></span>
+      </a>
+            
+      <!-- <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><input type="hidden" name="sitesearch" value="http://example.com"></form> -->
+    </div>
+    <div class="search-wrap">
+      <div class="search-content animated fade-in">
+        <p class="search-input">
+          <span class="iconfont icon-search"></span>
+          <input tabindex="1">
+        </p>
+        <ul class="search-result">
+            
+        </ul>
+      </div>
+    </div>
+    <nav class="header-nav">
+      
+        <a href="/" class="archives">
+          首页
+        </a>
+        
+        <a href="/archives" class="archives">
+          归档
+        </a>
+        
+    </nav>
+  </div>
+</header>
+    <script>NProgress.set(0.4);</script>
+    
+    <main id="main" role="main">
+      <article id="post-SpringCloudGateway搭建"
+  class="post article white-box article-type-post animated fade-in-top"
+  itemscope itemprop="blogPost">
+  <section class="post-header article-header">
+    <h2 class="title">
+        <a href="/2023/03/08/SpringCloudGateway%E6%90%AD%E5%BB%BA/">
+          网关gateway搭建
+        </a>
+      </h2>
+      <div class="subtitle">
+          <time>
+            2023年03月08日
+          </time>
+          
+      </div>
+  </section>
+  <section class="content">
+    <div class="article-entry" itemprop="articleBody">
+      <p><strong>为什么需要网关</strong></p>
+<p><img src="/image/14.png" alt="项目管理学习笔记"></p>
+<p><strong>为什么选择Spring cloud Gateway</strong></p>
+<p>常见的网关有gateway和zuul，和zuul相比，Spring Cloud Gateway具有如下优势：</p>
+<ul>
+<li>基于Reactor模型的WebFlux构建，运行在Netty上，具有更好的性能。</li>
+<li>可拓展性高，内置了非常丰富的断言及过滤器等，除此之外，我们也可以定义自己的断言和过滤器。</li>
+</ul>
+<p><strong>搭建gateway</strong></p>
+<p>pom依赖配置：</p>
+<pre><code class="pom">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;project xmlns=&quot;http://maven.apache.org/POM/4.0.0&quot; xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;
+         xsi:schemaLocation=&quot;http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd&quot;&gt;
+    &lt;modelVersion&gt;4.0.0&lt;/modelVersion&gt;
+
+    &lt;parent&gt;
+        &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+        &lt;artifactId&gt;spring-boot-starter-parent&lt;/artifactId&gt;
+        &lt;version&gt;2.2.1.RELEASE&lt;/version&gt;
+        &lt;relativePath/&gt;
+    &lt;/parent&gt;
+
+    &lt;groupId&gt;com.example&lt;/groupId&gt;
+    &lt;artifactId&gt;gateway&lt;/artifactId&gt;
+    &lt;version&gt;0.0.1-SNAPSHOT&lt;/version&gt;
+    &lt;name&gt;gateway&lt;/name&gt;
+    &lt;description&gt;gateway&lt;/description&gt;
+
+    &lt;properties&gt;
+        &lt;spring-cloud.version&gt;Hoxton.RELEASE&lt;/spring-cloud.version&gt;
+        &lt;spring-cloud-alibaba.version&gt;2.1.1.RELEASE&lt;/spring-cloud-alibaba.version&gt;
+    &lt;/properties&gt;
+
+    &lt;!-- 只声明依赖，不引入依赖 --&gt;
+    &lt;dependencyManagement&gt;
+        &lt;dependencies&gt;
+            &lt;!-- 声明springCloud版本 --&gt;
+            &lt;dependency&gt;
+                &lt;groupId&gt;org.springframework.cloud&lt;/groupId&gt;
+                &lt;artifactId&gt;spring-cloud-dependencies&lt;/artifactId&gt;
+                &lt;version&gt;$&#123;spring-cloud.version&#125;&lt;/version&gt;
+                &lt;type&gt;pom&lt;/type&gt;
+                &lt;scope&gt;import&lt;/scope&gt;
+            &lt;/dependency&gt;
+            &lt;!-- 声明 springCloud Alibaba 版本 --&gt;
+            &lt;dependency&gt;
+                &lt;groupId&gt;com.alibaba.cloud&lt;/groupId&gt;
+                &lt;artifactId&gt;spring-cloud-alibaba-dependencies&lt;/artifactId&gt;
+                &lt;version&gt;$&#123;spring-cloud-alibaba.version&#125;&lt;/version&gt;
+                &lt;type&gt;pom&lt;/type&gt;
+                &lt;scope&gt;import&lt;/scope&gt;
+            &lt;/dependency&gt;
+        &lt;/dependencies&gt;
+    &lt;/dependencyManagement&gt;
+
+    &lt;dependencies&gt;
+
+        &lt;dependency&gt;
+            &lt;groupId&gt;org.springframework.cloud&lt;/groupId&gt;
+            &lt;artifactId&gt;spring-cloud-starter-gateway&lt;/artifactId&gt;
+            &lt;exclusions&gt;
+                &lt;exclusion&gt;
+                    &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+                    &lt;artifactId&gt;spring-boot-starter-web&lt;/artifactId&gt;
+                &lt;/exclusion&gt;
+            &lt;/exclusions&gt;
+        &lt;/dependency&gt;
+
+        &lt;dependency&gt;
+            &lt;groupId&gt;com.alibaba.cloud&lt;/groupId&gt;
+            &lt;artifactId&gt;spring-cloud-starter-alibaba-nacos-discovery&lt;/artifactId&gt;
+        &lt;/dependency&gt;
+
+        &lt;dependency&gt;
+            &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+            &lt;artifactId&gt;spring-boot-starter-test&lt;/artifactId&gt;
+            &lt;scope&gt;test&lt;/scope&gt;
+        &lt;/dependency&gt;
+
+        &lt;dependency&gt;
+            &lt;groupId&gt;org.projectlombok&lt;/groupId&gt;
+            &lt;artifactId&gt;lombok&lt;/artifactId&gt;
+        &lt;/dependency&gt;
+    &lt;/dependencies&gt;
+
+&lt;/project&gt;
+</code></pre>
+<p>application.yml配置</p>
+<pre><code>server:
+  port: 8080
+  servlet:
+    context-path: /$&#123;spring.application.name&#125;
+spring:
+  application:
+    name: gateway
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 127.0.0.1:8001
+
+    gateway:
+      # 路由数组：指当请求满足什么样的断言时，转发到哪个服务上
+      routes:
+        # 路由标识，要求唯一，名称任意
+        - id: route1
+          # 请求最终被转发到的目标地址
+          #uri: http://localhost:8081
+          uri: lb://provider1
+          # 设置断言
+          predicates:
+            # Path Route Predicate Factory 断言，满足 /gateway/provider1/** 路径的请求都会被路由到 http://localhost:8081 这个uri中
+            - Path=/gateway/provider1/**
+          # 配置过滤器（局部）
+          filters:
+            # StripPrefix：去除原始请求路径中的前2级路径，即/gateway/provider1
+            - StripPrefix=2
+            - AddRequestHeader=X-Request-red, blue
+            - My
+
+        - id: route2
+          #uri: http://localhost:8082
+          uri: lb://provider2
+          # 设置断言
+          predicates:
+            - Path=/gateway/provider2/**
+          # 配置过滤器（局部）
+          filters:
+            # StripPrefix：去除原始请求路径中的前2级路径，即/gateway/provider1
+            - StripPrefix=2
+</code></pre>
+<p>以上的路由配置也可以基于bean来配置：</p>
+<pre><code>@Bean
+public RouteLocator addLocator(RouteLocatorBuilder routeLocatorBuilder)&#123;
+    return routeLocatorBuilder.routes()
+            .route(&quot;gateway-client&quot;, r -&gt; r.path(&quot;/gclient/**&quot;)
+                    .filters(f-&gt;f.addRequestParameter(&quot;X-Request-Token&quot;,&quot;2020ABC&quot;))
+                    .uri(&quot;lb://gateway-client&quot;)).build();
+&#125;
+</code></pre>
+<p><strong>核心名词解释</strong></p>
+<ul>
+<li>路由（Route）：gateway的基本构建模块。它由ID、目标URI、断言和过滤器等组成。</li>
+<li>断言（Predicate ）：也翻译成谓词，用于定义转发规则。</li>
+<li>过滤器（Filter）：可以在返回请求之前或之后修改请求和响应的内容。</li>
+</ul>
+<p><strong>Predicate (断言) (<a target="_blank" rel="noopener" href="https://docs.spring.io/spring-cloud-gateway/docs/2.2.9.RELEASE/reference/html/#gateway-request-predicates-factories">断言-官网参考文档</a>)</strong></p>
+<p>gateway内置了很多断言，篇幅限制，列出两种，源码位于：org.springframework.cloud.gateway.handler.predicate下：</p>
+<ul>
+<li><p>AfterRoutePredicateFactory</p>
+<pre><code>spring:
+cloud:
+  gateway:
+    routes:
+    - id: after_route
+      uri: http://mantou.plus  #如果请求时间在配置的时间点之后，全部转发到http://mantou.plus
+      predicates:
+      - After=2023-03-07T22:42:47.789-07:00[America/Denver]
+</code></pre>
+</li>
+<li><p>BeforeRoutePredicateFactory</p>
+<pre><code>spring:
+cloud:
+  gateway:
+    routes:
+    - id: after_route
+      uri: http://www.mantou.plus  #如果请求时间在配置的时间点之前，全部转发到http://mantou.plus
+      predicates:
+      - Before=2023-03-07T22:42:47.789-07:00[America/Denver]
+</code></pre>
+</li>
+</ul>
+<p><strong>过滤器 (<a target="_blank" rel="noopener" href="https://docs.spring.io/spring-cloud-gateway/docs/2.2.9.RELEASE/reference/html/#gatewayfilter-factories">过滤器-官网参考文档</a>)</strong> </p>
+<p>gateway也内置了很多过滤器，，篇幅限制，列出两种，源码位于：org.springframework.cloud.gateway.filter.factor下：</p>
+<ul>
+<li>AddRequestHeader</li>
+</ul>
+<pre><code class="yaml">spring:
+  cloud:
+    gateway:
+      routes:
+      - id: add_request_header_route
+        uri: https://mantou.plus    #在请求发到目标微服务之前添加请求头X-Request-red，其值为：blue
+        filters:
+        - AddRequestHeader=X-Request-red, blue
+</code></pre>
+<ul>
+<li>StripPrefix</li>
+</ul>
+<pre><code class="yaml">spring:
+  cloud:
+    gateway:
+      routes:
+      - id: strip_prefix_route
+        uri: https://mantou.plus   #在请求发到目标微服务之前去掉1级前缀，例如 http://localhost:8080/name/weixiaojie，就会转发到:https://mantou.plus/weixiaojie
+        predicates:
+        - Path=/name/**
+        filters:
+        - StripPrefix=1
+</code></pre>
+<p>自定义过滤器：</p>
+<pre><code class="java">@Slf4j
+@Component
+public class MyGatewayFilterFactory extends AbstractGatewayFilterFactory &#123;
+
+    @Override
+    public GatewayFilter apply(Object config) &#123;
+        return ((exchange, chain) -&gt; &#123;
+            log.info(&quot;自定义过滤器添加请求头：blog,添加响应头: Title&quot;);
+            ServerHttpRequest request = exchange.getRequest().mutate().header(&quot;blog&quot;, &quot;https://mantou.plus&quot;).build();
+            ServerWebExchange ex = exchange.mutate().request(request).build();
+            ex.getResponse().getHeaders().add(&quot;Title&quot;,&quot;BlackHorse&quot;);
+            return chain.filter(ex);
+        &#125;);
+
+    &#125;
+&#125;
+</code></pre>
+<p>GlobalFilter，无需配置，全局生效:</p>
+<pre><code class="java">@Slf4j
+@Component
+@Order(1)
+public class TokenGlobalFilter implements GlobalFilter &#123;
+
+    @Override
+    public Mono&lt;Void&gt; filter(ServerWebExchange exchange, GatewayFilterChain chain) &#123;
+        log.info(&quot;进入token过滤器&quot;);
+        String token = exchange.getRequest().getHeaders().getFirst(&quot;token&quot;);
+        if (token != null &amp;&amp; !&quot;&quot;.equals(token)) &#123;
+            log.info(&quot;找到了token：&#123;&#125;&quot;, token);
+            return chain.filter(exchange);
+        &#125; else &#123;
+            log.error(&quot;没有找到token，未授权，不允许访问&quot;);
+            ServerHttpResponse response = exchange.getResponse();
+            response.setStatusCode(HttpStatus.UNAUTHORIZED);
+            return response.setComplete();
+        &#125;
+    &#125;
+&#125;
+</code></pre>
+<pre><code class="java">@Slf4j
+@Component
+@Order(2)
+public class LogGlobalFilter implements GlobalFilter &#123;
+
+    @Override
+    public Mono&lt;Void&gt; filter(ServerWebExchange exchange, GatewayFilterChain chain) &#123;
+        log.info(&quot;进入日志过滤器&quot;);
+        //filter的前置处理
+        ServerHttpRequest request = exchange.getRequest();
+        String path = request.getPath().pathWithinApplication().value();
+        InetSocketAddress remoteAddress = request.getRemoteAddress();
+        return chain
+                //继续调用filter
+                .filter(exchange)
+                //filter的后置处理
+                .then(Mono.fromRunnable(() -&gt; &#123;
+                    ServerHttpResponse response = exchange.getResponse();
+                    HttpStatus statusCode = response.getStatusCode();
+                    log.info(&quot;请求路径:&#123;&#125;,远程IP地址:&#123;&#125;,响应码:&#123;&#125;&quot;, path, remoteAddress, statusCode);
+                &#125;));
+    &#125;
+&#125;
+</code></pre>
+<p><strong>集成注册中心</strong></p>
+<p>微服务情况下，每个服务有多个实例，为了防止IP变化等引起的调用问题，就需要引入服务注册和服务发现</p>
+<p>pom文件添加依赖：</p>
+<pre><code>
+&lt;dependency&gt;
+    &lt;groupId&gt;org.springframework.cloud&lt;/groupId&gt;
+    &lt;artifactId&gt;spring-cloud-starter&lt;/artifactId&gt;
+&lt;/dependency&gt;
+
+&lt;dependency&gt;
+  &lt;groupId&gt;com.alibaba.cloud&lt;/groupId&gt;
+  &lt;artifactId&gt;spring-cloud-starter-alibaba-nacos-discovery&lt;/artifactId&gt;
+&lt;/dependency&gt;
+</code></pre>
+<p>启动类添加：@EnableDiscoveryClient注解</p>
+<pre><code class="java">@SpringBootApplication
+@EnableDiscoveryClient
+public class GatewayApplication &#123;
+
+    public static void main(String[] args) &#123;
+        SpringApplication.run(GatewayApplication.class, args);
+    &#125;
+
+&#125;
+</code></pre>
+<p>每个服务的application.yml加入以下内容，表示把该服务注册到nacos注册中心中去：</p>
+<pre><code class="yaml">spring:
+  cloud:
+    nacos:
+      discovery:
+        # nacos的服务地址，nacos-server中IP地址:端口号
+        server-addr: 127.0.0.1:8001
+</code></pre>
+<p>修改routes配置，可以使用服务名称来调用了：其中lb表示负载均衡，</p>
+<pre><code>#uri: http://localhost:8081
+uri: lb://provider_1
+</code></pre>
+<p><strong>自定义全局异常处理</strong></p>
+<p>当遇到异常的时候，可以做一些自定义处理，比如使用返回json格式结果，更易于前段解析 </p>
+<pre><code class="java">@Slf4j
+@Order(-1)
+@Component
+@RequiredArgsConstructor
+public class GlobalErrorExceptionHandler implements ErrorWebExceptionHandler &#123;
+
+    private final ObjectMapper objectMapper;
+
+    @SuppressWarnings(&#123;&quot;rawtypes&quot;, &quot;unchecked&quot;, &quot;NullableProblems&quot;&#125;)
+    @Override
+    public Mono&lt;Void&gt; handle(ServerWebExchange exchange, Throwable ex) &#123;
+        ServerHttpResponse response = exchange.getResponse();
+        if (response.isCommitted()) &#123;
+            return Mono.error(ex);
+        &#125;
+
+        // JOSN格式返回
+        response.getHeaders().setContentType(MediaType.APPLICATION_JSON);
+        if (ex instanceof ResponseStatusException) &#123;
+            response.setStatusCode(((ResponseStatusException) ex).getStatus());
+        &#125;
+
+        return response.writeWith(Mono.fromSupplier(() -&gt; &#123;
+            DataBufferFactory bufferFactory = response.bufferFactory();
+            try &#123;
+                CommonResponse resultMsg = new CommonResponse(&quot;500&quot;, ex.getMessage(), null);
+                return bufferFactory.wrap(objectMapper.writeValueAsBytes(resultMsg));
+            &#125; catch (JsonProcessingException e) &#123;
+                log.error(&quot;Error writing response&quot;, ex);
+                return bufferFactory.wrap(new byte[0]);
+            &#125;
+        &#125;));
+    &#125;
+
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class CommonResponse &#123;
+        String code;
+        String message;
+        String data;
+    &#125;
+
+&#125;
+</code></pre>
+<p><strong>实现动态路由</strong></p>
+<p>从前面我们可以看到路由的配置主要通过application.yml和代码@Bean配置，无论是哪一种，在启动网关后将无法修改路由配置，如有新服务要上线，则需要先把网关下线，修改 yml 配置后，再重启网关。核心类为：RouteDefinitionWriter，位于org.springframework.cloud.gateway.route包下 。此处需要阅读源码，方式较多，我们放到下一节介绍。</p>
+
+    </div>
+  </section>
+
+  
+  
+</article>
+      <script>NProgress.set(0.6);</script>
+    </main>
+    
+    <!-- <footer class="footer">
+  <div class="footer-wrap">
+    <div class="footer-link">
+      
+      <h3>LINKS</h3>
+      <p>
+        
+          <a href="http://1x0.xyz/" target="_blank">Tian1x0</a>
+        
+          <a href="http://www.royalmice.com/hankzhou/" target="_blank">Hankzhou</a>
+        
+          <a href="http://sjydh.me/" target="_blank">设计有点货</a>
+        
+          <a href="https://developers.google.com/web/fundamentals/" target="_blank">Web fundamentals</a>
+        
+      </p>
+      
+    </div>
+    <div class="footer-tags">
+      
+    </div>
+    <div class="footer-info">
+        <div>Theme <span class="codename"><a href="https://github.com/GGICE/hexo-icer" target="_blank">icer</a></span> designed & coded by <a href="https://ice.gs/" target="_blank">GGICE</a></div>
+        <div>Copyright &copy; 2026, <a href="/">超级大馒头</a>  . All rights reserved .</div>
+      </div>
+  </div>
+</footer>
+ -->
+
+    <script>NProgress.set(0.8);</script>
+    
+  </div>
+
+  <script src="/js/highlight.min.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+
+<script src="/js/main.js"></script>
+
+
+<!-- Commit -->
+
+
+
+  <script>
+    NProgress.done();
+  </script>
+  
+</body>
+</html>

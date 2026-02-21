@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  
+  <title>深入理解Java虚拟机 | 超级大馒头</title>
+  <meta name="description" content="A amazing blog." />
+  <meta name="keywords" content="hexo,theme,mantou,plus" />
+  <meta name="HandheldFriendly" content="True" />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="java开发过程难免会遇到内存溢出，CPU消耗过高等问题，理解JVM结构及其原理有助于排查以上问题，其架构如下：  **其中方法区和java堆，为线程共享区域。程序计数器，虚拟机栈，本地方法栈为线程独占区。**   方法区：存储运行时常量池，已被虚拟机加载的类信息、常量、静态变量、即时编译器编译后的代码等数据。在jdk7及以前，习惯上把方法区，称为永久代。只有HotSpot才有永久代。对EA JR">
+<meta property="og:type" content="article">
+<meta property="og:title" content="深入理解Java虚拟机">
+<meta property="og:url" content="http://example.com/2022/11/07/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA/index.html">
+<meta property="og:site_name" content="超级大馒头">
+<meta property="og:description" content="java开发过程难免会遇到内存溢出，CPU消耗过高等问题，理解JVM结构及其原理有助于排查以上问题，其架构如下：  **其中方法区和java堆，为线程共享区域。程序计数器，虚拟机栈，本地方法栈为线程独占区。**   方法区：存储运行时常量池，已被虚拟机加载的类信息、常量、静态变量、即时编译器编译后的代码等数据。在jdk7及以前，习惯上把方法区，称为永久代。只有HotSpot才有永久代。对EA JR">
+<meta property="og:locale">
+<meta property="og:image" content="http://example.com/image/10.png">
+<meta property="og:image" content="http://example.com/image/11.png">
+<meta property="og:image" content="http://example.com/image/12.png">
+<meta property="og:image" content="http://example.com/image/13.png">
+<meta property="article:published_time" content="2022-11-06T16:00:00.000Z">
+<meta property="article:modified_time" content="2023-03-25T09:37:30.000Z">
+<meta property="article:author" content="weixiaojie">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/image/10.png">
+  
+  
+    <link rel="icon" href="/image/favicon.ico">
+  
+
+  <link rel='stylesheet' href='/css/nprogress.css'/>
+  <link rel="stylesheet" href="/css/github-gist.min.css">
+  <link rel="stylesheet" href="/css/font_405585_yuudmyqpo3q.css">
+  <script src='/js/nprogress.min.js'></script>
+  <!-- <script>try{Typekit.load({ async: false });}catch(e){}</script> -->
+  
+<link rel="stylesheet" href="/style.css">
+
+  
+
+  
+
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+<body>
+  
+  <script>NProgress.start();</script>
+  
+  <div id="site-wrapper">
+    
+    <header class="header">
+  <div class="header-wrapper">
+    <a href="/">
+      <img src="/image/logo.jpg" class="logo"/>
+      <!-- <span class="site-desc">
+        
+      </span> -->
+    </a>
+    <div class="social-wrapper">
+      
+        
+          <a href="https://github.com/weixiaojie" class="social github" target="_blank" rel="external">
+            <span class="iconfont icon-github"></span>
+          </a>
+          
+          <a href="https://weibo.com/u/2156965395" class="social weibo" target="_blank" rel="external">
+            <span class="iconfont icon-weibo"></span>
+          </a>
+          
+          <a href="mailto:18565765503@163.com" class="social email" target="_blank" rel="external">
+            <span class="iconfont icon-email"></span>
+          </a>
+          
+      
+      
+      <a href="#" class="social search-do" target="_blank" rel="external">
+        <span class="iconfont icon-search"></span>
+      </a>
+            
+      <!-- <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><input type="hidden" name="sitesearch" value="http://example.com"></form> -->
+    </div>
+    <div class="search-wrap">
+      <div class="search-content animated fade-in">
+        <p class="search-input">
+          <span class="iconfont icon-search"></span>
+          <input tabindex="1">
+        </p>
+        <ul class="search-result">
+            
+        </ul>
+      </div>
+    </div>
+    <nav class="header-nav">
+      
+        <a href="/" class="archives">
+          首页
+        </a>
+        
+        <a href="/archives" class="archives">
+          归档
+        </a>
+        
+    </nav>
+  </div>
+</header>
+    <script>NProgress.set(0.4);</script>
+    
+    <main id="main" role="main">
+      <article id="post-深入理解Java虚拟机"
+  class="post article white-box article-type-post animated fade-in-top"
+  itemscope itemprop="blogPost">
+  <section class="post-header article-header">
+    <h2 class="title">
+        <a href="/2022/11/07/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA/">
+          深入理解Java虚拟机
+        </a>
+      </h2>
+      <div class="subtitle">
+          <time>
+            2022年11月07日
+          </time>
+          
+      </div>
+  </section>
+  <section class="content">
+    <div class="article-entry" itemprop="articleBody">
+      <p>java开发过程难免会遇到内存溢出，CPU消耗过高等问题，理解JVM结构及其原理有助于排查以上问题，其架构如下：</p>
+<p><img src="/image/10.png" alt="JVM架构图"></p>
+<pre><code>**其中方法区和java堆，为线程共享区域。程序计数器，虚拟机栈，本地方法栈为线程独占区。**
+</code></pre>
+<ul>
+<li><p>方法区：存储运行时常量池，已被虚拟机加载的类信息、常量、静态变量、即时编译器编译后的代码等数据。在jdk7及以前，习惯上把方法区，称为永久代。只有HotSpot才有永久代。对EA JRockit、 IBM J9等来说，是不存在永久代的概念的。jdk8开始， 使用元空间取代了永久代。方法区在JVM启动的时候被创建，并且它的实际的物理内存空间中和Java堆区一样都可以是不连续的。 方法区的大小，跟堆空间一样，可以选择固定大小或者可扩展。方法区的大小决定了系统可以保存多少个类，如果系统定义了太多的类，导致方法区溢出，虚拟机同样会抛出内存溢出错误: java.lang .OutofMemoryError:PermGenspace（1.8之前）或者java.lang.OutOfMemoryError: Metaspace（1.8之后），关闭JVM就会释放这个区域的内存。例如：加载大量的第三方的jar包; Tomcat 部署的工程过多(30-50个) ;大量动态的生成反射类都有可能OOM。</p>
+</li>
+<li><p>Java堆：存储对象实例，有Eden区，Survivor区（2个），OldGen老年代， 其中比例：（三部分比例8:1:1）Eden + Survivor +Survivor （1/3堆内存） ，old区（2/3堆内存）。</p>
+</li>
+<li><p>虚拟机栈：存放方法运行时所需的数据，每个方法被执行的时候，Java虚拟机都会同步创建一个栈帧（Stack Frame）。生命周期与线程相同（随线程而生，随线程而灭）。每一个方法被调用直至执行完毕的过程，就对应这一个栈帧在虚拟机栈中从入栈到出栈的过程。如果线程请求分配的栈容量超过Java虚拟机允许的最大容量，则抛出StackOverflowError异常（比如错误的递归调用）；</p>
+</li>
+<li><p>本地方法栈：基本同虚拟机栈，只不过调用的方法为native方法</p>
+</li>
+<li><p>程序计数器：记录当前线程所执行到的字节码的行号，以及JVM指令地址，字节码解释器工作时就是通过改变这个计数器的值来选取下一条需要执行的字节码指令。是程序控制流的指示器，分支、循环、跳转、异常处理、线程恢复等基础功能都需要依赖这个计数器来完成，是唯一一个在java虚拟机规范中没有规定任何OOM(Out Of Memery)情况的区域,而且没有垃圾回收</p>
+</li>
+<li><p>Execution Engine（执行引擎）：负责解释命令，提交操作系统执行。包括：中间代码生成器，代码优化器，目标代码生成器，探测分析器，以及垃圾收集GC</p>
+</li>
+</ul>
+<pre><code>**MinorGC的过程 (复制-&gt;清空-&gt;互换)**
+</code></pre>
+<ul>
+<li>SurvivorFrom 复制到 SurvivorTo，年龄+1eden首先，当Eden区满的时候会触发第一次GC,把还活着的对象拷贝到SurvivorFrom区，当Eden区再次触发GC的时候会扫描Eden区和From区域,对这两个区域进行垃圾回收，经过这次回收后还存活的对象,则直接复制到To区域(如果有对象的年龄已经达到了老年的标准，则赋值到老年代区)，同时把这些对象的年龄+1 。然后清空 eden、SurvivorFrom</li>
+</ul>
+<ul>
+<li><p>清空Eden和SurvivorFrom中的对象，也即复制之后有交换，谁空谁是to,SurvivorTo和 SurvivorFrom 互换</p>
+</li>
+<li><p>最后，SurvivorTo和SurvivorFrom互换，原SurvivorTo成为下一次GC时的SurvivorFrom区。部分对象会在From和To区域中复制来复制去,如此交换15次(由JVM参数MaxTenuringThreshold决定,这个参数默认是15),最终如果还是存活,就存入到老年代</p>
+</li>
+<li><p>扩展：之所以使用两个<strong>Survivor</strong>，是为了以空间换时间，如果只有一个survivor，survivor区的GC回收只能只用标记整理算法（效率较低）或者标记清楚算法（存在内存碎片），</p>
+</li>
+</ul>
+<pre><code>**设置方法区内存大小**
+</code></pre>
+<ul>
+<li><p>jdk7及以前: 通过-XX:PermSize来设置永久代初始分配空间。默认值是20.75M，-XX :MaxPe rmSi ze来设定永久代最大可分配空间。32位机器默认是64M，64位机 器模式是82M，当JVM加载的类信 息容量超过了这个值，会报异常Outo fMemoryError : PermGen space。</p>
+</li>
+<li><p>jdk8及以后: 元数据区大小可以使用参数-XX:MetaspaceSize和-XX :MaxMetaspaceSize指定，替代上述原有的两个参数。默认值依赖于平台。windows下，-XX :MetaspaceSize是21M， -XX :MaxMetaspaceSize的值是-1，即没有限制。与永久代不同，如果不指定大小，默认情况下，虚拟机会耗尽所有的可用系统内存。如果元数据区发生溢出，虚拟机一样会抛出异常OutOfMemoryError: Metaspace</p>
+</li>
+<li><p>XX:MetaspaceSize: 设置初始的元空间大小。对于64位的服务器端JVM来说, (其默认的-XX:MetaspaceSize值为21MB。这就是初始的高水位线，一 旦触及这个水位线，Full GC将会被触发并卸载没用的类(即这些类对应的类加载器不再存活)，然后这个高水位线将会重置。新的高水位线的值取决于GC后释放了多少元空间。如果释放的空间不足，那么在不超过MaxMetaspaceSize时，适当提高该值。如果释放空间过多，则适当降低该值。如果初始化的高水位线设置过低，上述高水位 线调整情况会发生很多次。通过垃圾回收器的日志可以观察到Full GC多次调用。为了避免频繁地GC，建议将-XX :MetaspaceSize设置为一个相对较高的值。</p>
+</li>
+</ul>
+<pre><code> **垃圾回收算法**
+</code></pre>
+<p><img src="/image/11.png" alt="垃圾回收算法"></p>
+<pre><code> **G1垃圾收集器**
+</code></pre>
+<p>这里是G1垃圾收集器的内容，超级大馒头休息去了，等待补充……</p>
+<pre><code> **内存模型（Java Memory Model ,简称JMM）**
+</code></pre>
+<p><img src="/image/12.png" alt="内存模型"></p>
+<p>Java内存模型规定了所有的变量都存储在主内存中，每条线程还有自己的工作内存，线程的工作内存中保存了该线程中是用到的变量的主内存副本拷贝，线程对变量的所有操作都必须在工作内存中进行，而不能直接读写主内存。不同的线程之间也无法直接访问对方工作内存中的变量，线程间变量的传递均需要自己的工作内存和主存之间进行数据同步进行。而JMM就作用于工作内存和主存之间数据同步过程。他规定了如何做数据同步以及什么时候做数据同步。</p>
+<p><strong>内存模型的8种操作模式</strong></p>
+<ul>
+<li>lock（锁定）：作用于主内存的变量，把一个变量标识为一条线程独占状态。</li>
+<li>unlock（解锁）：作用于主内存变量，把一个处于锁定状态的变量释放出来，释放后的变量才可以被其他线程锁定。</li>
+<li>uread（读取）：作用于主内存变量，把一个变量值从主内存传输到线程的工作内存中，以便随后的load动作使用。</li>
+<li>uload（载入）：作用于工作内存的变量，它把read操作从主内存中得到的变量值放入工作内存的变量副本中。</li>
+<li>uuse（使用）：作用于工作内存的变量，把工作内存中的一个变量值传递给执行引擎，每当虚拟机遇到一个需要使用变量的值的字节码指令时将会执行这个操作。</li>
+<li>uassign（赋值）：作用于工作内存的变量，它把一个从执行引擎接收到的值赋值给工作内存的变量，每当虚拟机遇到一个给变量赋值的字节码指令时执行这个操作。</li>
+<li>ustore（存储）：作用于工作内存的变量，把工作内存中的一个变量的值传送到主内存中，以便随后的write的操作。</li>
+<li>uwrite（写入）：作用于主内存的变量，它把store操作从工作内存中一个变量的值传送到主内存的变量中。</li>
+</ul>
+<p><strong>内存模型的3个特性</strong></p>
+<ul>
+<li><p>原子性：在Java中，为了保证原子性，提供了两个高级的字节码指令monitorenter和monitorexit。因此，在Java中可以使用synchronized来保证方法和代码块内的操作是原子性的。</p>
+</li>
+<li><p>可见性：volatile关键字提供了一个功能，被其修饰的变量在被修改后可以立即同步到主内存，被其修饰的变量在每次是用之前都从主内存刷新，以此来保证可见性</p>
+</li>
+<li><p>有序性：在Java中，可以使用synchronized和volatile来保证多线程之间操作的有序性。volatile关键字会禁止指令重排。synchronized关键字保证同一时刻只允许一条线程操作。</p>
+</li>
+</ul>
+<pre><code>**四种引用类型**
+</code></pre>
+<p><img src="/image/13.png" alt="四种引用类型"></p>
+
+    </div>
+  </section>
+
+  
+  
+</article>
+      <script>NProgress.set(0.6);</script>
+    </main>
+    
+    <!-- <footer class="footer">
+  <div class="footer-wrap">
+    <div class="footer-link">
+      
+      <h3>LINKS</h3>
+      <p>
+        
+          <a href="http://1x0.xyz/" target="_blank">Tian1x0</a>
+        
+          <a href="http://www.royalmice.com/hankzhou/" target="_blank">Hankzhou</a>
+        
+          <a href="http://sjydh.me/" target="_blank">设计有点货</a>
+        
+          <a href="https://developers.google.com/web/fundamentals/" target="_blank">Web fundamentals</a>
+        
+      </p>
+      
+    </div>
+    <div class="footer-tags">
+      
+    </div>
+    <div class="footer-info">
+        <div>Theme <span class="codename"><a href="https://github.com/GGICE/hexo-icer" target="_blank">icer</a></span> designed & coded by <a href="https://ice.gs/" target="_blank">GGICE</a></div>
+        <div>Copyright &copy; 2026, <a href="/">超级大馒头</a>  . All rights reserved .</div>
+      </div>
+  </div>
+</footer>
+ -->
+
+    <script>NProgress.set(0.8);</script>
+    
+  </div>
+
+  <script src="/js/highlight.min.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+
+<script src="/js/main.js"></script>
+
+
+<!-- Commit -->
+
+
+
+  <script>
+    NProgress.done();
+  </script>
+  
+</body>
+</html>

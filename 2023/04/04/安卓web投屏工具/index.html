@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  
+  <title>安卓web投屏工具 | 超级大馒头</title>
+  <meta name="description" content="A amazing blog." />
+  <meta name="keywords" content="hexo,theme,mantou,plus" />
+  <meta name="HandheldFriendly" content="True" />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="在移动App信息安全的监测项目中，通常需要用到安卓web投屏，实时查看某些app的运行情况，可以使用stf，由于stf部署复杂，依赖众多，如果只要显示单个机器实时屏幕的情况下，部署stf过于浪费。以下为基于minicap和minitouch的安卓web投屏工具，项目地址，效果图如下：">
+<meta property="og:type" content="article">
+<meta property="og:title" content="安卓web投屏工具">
+<meta property="og:url" content="http://example.com/2023/04/04/%E5%AE%89%E5%8D%93web%E6%8A%95%E5%B1%8F%E5%B7%A5%E5%85%B7/index.html">
+<meta property="og:site_name" content="超级大馒头">
+<meta property="og:description" content="在移动App信息安全的监测项目中，通常需要用到安卓web投屏，实时查看某些app的运行情况，可以使用stf，由于stf部署复杂，依赖众多，如果只要显示单个机器实时屏幕的情况下，部署stf过于浪费。以下为基于minicap和minitouch的安卓web投屏工具，项目地址，效果图如下：">
+<meta property="og:locale">
+<meta property="og:image" content="http://example.com/image/sstf.gif">
+<meta property="article:published_time" content="2023-04-03T16:00:00.000Z">
+<meta property="article:modified_time" content="2024-11-13T03:01:58.619Z">
+<meta property="article:author" content="weixiaojie">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/image/sstf.gif">
+  
+  
+    <link rel="icon" href="/image/favicon.ico">
+  
+
+  <link rel='stylesheet' href='/css/nprogress.css'/>
+  <link rel="stylesheet" href="/css/github-gist.min.css">
+  <link rel="stylesheet" href="/css/font_405585_yuudmyqpo3q.css">
+  <script src='/js/nprogress.min.js'></script>
+  <!-- <script>try{Typekit.load({ async: false });}catch(e){}</script> -->
+  
+<link rel="stylesheet" href="/style.css">
+
+  
+
+  
+
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+<body>
+  
+  <script>NProgress.start();</script>
+  
+  <div id="site-wrapper">
+    
+    <header class="header">
+  <div class="header-wrapper">
+    <a href="/">
+      <img src="/image/logo.jpg" class="logo"/>
+      <!-- <span class="site-desc">
+        
+      </span> -->
+    </a>
+    <div class="social-wrapper">
+      
+        
+          <a href="https://github.com/weixiaojie" class="social github" target="_blank" rel="external">
+            <span class="iconfont icon-github"></span>
+          </a>
+          
+          <a href="https://weibo.com/u/2156965395" class="social weibo" target="_blank" rel="external">
+            <span class="iconfont icon-weibo"></span>
+          </a>
+          
+          <a href="mailto:18565765503@163.com" class="social email" target="_blank" rel="external">
+            <span class="iconfont icon-email"></span>
+          </a>
+          
+      
+      
+      <a href="#" class="social search-do" target="_blank" rel="external">
+        <span class="iconfont icon-search"></span>
+      </a>
+            
+      <!-- <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><input type="hidden" name="sitesearch" value="http://example.com"></form> -->
+    </div>
+    <div class="search-wrap">
+      <div class="search-content animated fade-in">
+        <p class="search-input">
+          <span class="iconfont icon-search"></span>
+          <input tabindex="1">
+        </p>
+        <ul class="search-result">
+            
+        </ul>
+      </div>
+    </div>
+    <nav class="header-nav">
+      
+        <a href="/" class="archives">
+          首页
+        </a>
+        
+        <a href="/archives" class="archives">
+          归档
+        </a>
+        
+    </nav>
+  </div>
+</header>
+    <script>NProgress.set(0.4);</script>
+    
+    <main id="main" role="main">
+      <article id="post-安卓web投屏工具"
+  class="post article white-box article-type-post animated fade-in-top"
+  itemscope itemprop="blogPost">
+  <section class="post-header article-header">
+    <h2 class="title">
+        <a href="/2023/04/04/%E5%AE%89%E5%8D%93web%E6%8A%95%E5%B1%8F%E5%B7%A5%E5%85%B7/">
+          安卓web投屏工具
+        </a>
+      </h2>
+      <div class="subtitle">
+          <time>
+            2023年04月04日
+          </time>
+          
+      </div>
+  </section>
+  <section class="content">
+    <div class="article-entry" itemprop="articleBody">
+      <p>在移动App信息安全的监测项目中，通常需要用到安卓web投屏，实时查看某些app的运行情况，可以使用stf，由于stf部署复杂，依赖众多，如果只要显示单个机器实时屏幕的情况下，部署stf过于浪费。以下为基于minicap和minitouch的安卓web投屏工具，<a target="_blank" rel="noopener" href="https://github.com/weixiaojie/SSTF">项目地址</a>，效果图如下：</p>
+<p><img src="/image/sstf.gif" alt="安卓web投屏工具"></p>
+
+    </div>
+  </section>
+
+  
+  
+</article>
+      <script>NProgress.set(0.6);</script>
+    </main>
+    
+    <!-- <footer class="footer">
+  <div class="footer-wrap">
+    <div class="footer-link">
+      
+      <h3>LINKS</h3>
+      <p>
+        
+          <a href="http://1x0.xyz/" target="_blank">Tian1x0</a>
+        
+          <a href="http://www.royalmice.com/hankzhou/" target="_blank">Hankzhou</a>
+        
+          <a href="http://sjydh.me/" target="_blank">设计有点货</a>
+        
+          <a href="https://developers.google.com/web/fundamentals/" target="_blank">Web fundamentals</a>
+        
+      </p>
+      
+    </div>
+    <div class="footer-tags">
+      
+    </div>
+    <div class="footer-info">
+        <div>Theme <span class="codename"><a href="https://github.com/GGICE/hexo-icer" target="_blank">icer</a></span> designed & coded by <a href="https://ice.gs/" target="_blank">GGICE</a></div>
+        <div>Copyright &copy; 2026, <a href="/">超级大馒头</a>  . All rights reserved .</div>
+      </div>
+  </div>
+</footer>
+ -->
+
+    <script>NProgress.set(0.8);</script>
+    
+  </div>
+
+  <script src="/js/highlight.min.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+
+<script src="/js/main.js"></script>
+
+
+<!-- Commit -->
+
+
+
+  <script>
+    NProgress.done();
+  </script>
+  
+</body>
+</html>

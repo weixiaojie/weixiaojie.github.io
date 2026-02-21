@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  
+  <title>eval(function(p,a,c,k,e,d){}()) | 超级大馒头</title>
+  <meta name="description" content="A amazing blog." />
+  <meta name="keywords" content="hexo,theme,mantou,plus" />
+  <meta name="HandheldFriendly" content="True" />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="前段时间，领导安排了一个poc的演示任务，将上面这个网站的左半部分替换成发票图片列表，点击发票列表中的图片，自动将图片中的信息填充到右侧的表单中，进行查验。 打开chrome的F12研究了一下网站的代码，网站所有的JS都是如下的加密形式： eval(function(p,a,c,k,e,d)&amp;#123;e&#x3D;function(c)&amp;#123;return(c&lt;a?&quot;&quot;:e">
+<meta property="og:type" content="article">
+<meta property="og:title" content="eval(function(p,a,c,k,e,d){}())">
+<meta property="og:url" content="http://example.com/2018/04/14/eval(function(p,a,c,k,e,d)%7B%7D())/index.html">
+<meta property="og:site_name" content="超级大馒头">
+<meta property="og:description" content="前段时间，领导安排了一个poc的演示任务，将上面这个网站的左半部分替换成发票图片列表，点击发票列表中的图片，自动将图片中的信息填充到右侧的表单中，进行查验。 打开chrome的F12研究了一下网站的代码，网站所有的JS都是如下的加密形式： eval(function(p,a,c,k,e,d)&amp;#123;e&#x3D;function(c)&amp;#123;return(c&lt;a?&quot;&quot;:e">
+<meta property="og:locale">
+<meta property="og:image" content="http://example.com/image/1.webp">
+<meta property="article:published_time" content="2018-04-13T16:00:00.000Z">
+<meta property="article:modified_time" content="2023-02-11T16:14:32.000Z">
+<meta property="article:author" content="weixiaojie">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/image/1.webp">
+  
+  
+    <link rel="icon" href="/image/favicon.ico">
+  
+
+  <link rel='stylesheet' href='/css/nprogress.css'/>
+  <link rel="stylesheet" href="/css/github-gist.min.css">
+  <link rel="stylesheet" href="/css/font_405585_yuudmyqpo3q.css">
+  <script src='/js/nprogress.min.js'></script>
+  <!-- <script>try{Typekit.load({ async: false });}catch(e){}</script> -->
+  
+<link rel="stylesheet" href="/style.css">
+
+  
+
+  
+
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+<body>
+  
+  <script>NProgress.start();</script>
+  
+  <div id="site-wrapper">
+    
+    <header class="header">
+  <div class="header-wrapper">
+    <a href="/">
+      <img src="/image/logo.jpg" class="logo"/>
+      <!-- <span class="site-desc">
+        
+      </span> -->
+    </a>
+    <div class="social-wrapper">
+      
+        
+          <a href="https://github.com/weixiaojie" class="social github" target="_blank" rel="external">
+            <span class="iconfont icon-github"></span>
+          </a>
+          
+          <a href="https://weibo.com/u/2156965395" class="social weibo" target="_blank" rel="external">
+            <span class="iconfont icon-weibo"></span>
+          </a>
+          
+          <a href="mailto:18565765503@163.com" class="social email" target="_blank" rel="external">
+            <span class="iconfont icon-email"></span>
+          </a>
+          
+      
+      
+      <a href="#" class="social search-do" target="_blank" rel="external">
+        <span class="iconfont icon-search"></span>
+      </a>
+            
+      <!-- <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><input type="hidden" name="sitesearch" value="http://example.com"></form> -->
+    </div>
+    <div class="search-wrap">
+      <div class="search-content animated fade-in">
+        <p class="search-input">
+          <span class="iconfont icon-search"></span>
+          <input tabindex="1">
+        </p>
+        <ul class="search-result">
+            
+        </ul>
+      </div>
+    </div>
+    <nav class="header-nav">
+      
+        <a href="/" class="archives">
+          首页
+        </a>
+        
+        <a href="/archives" class="archives">
+          归档
+        </a>
+        
+    </nav>
+  </div>
+</header>
+    <script>NProgress.set(0.4);</script>
+    
+    <main id="main" role="main">
+      <article id="post-eval(function(p,a,c,k,e,d){}())"
+  class="post article white-box article-type-post animated fade-in-top"
+  itemscope itemprop="blogPost">
+  <section class="post-header article-header">
+    <h2 class="title">
+        <a href="/2018/04/14/eval(function(p,a,c,k,e,d)%7B%7D())/">
+          eval(function(p,a,c,k,e,d){}())
+        </a>
+      </h2>
+      <div class="subtitle">
+          <time>
+            2018年04月14日
+          </time>
+          
+      </div>
+  </section>
+  <section class="content">
+    <div class="article-entry" itemprop="articleBody">
+      <p><a target="_blank" rel="noopener" href="https://inv-veri.chinatax.gov.cn/"><img src="/image/1.webp" alt="国家税务总局全国增值税发票查验平台"></a></p>
+<p>前段时间，领导安排了一个poc的演示任务，将上面这个网站的左半部分替换成发票图片列表，点击发票列表中的图片，自动将图片中的信息填充到右侧的表单中，进行查验。</p>
+<p>打开chrome的F12研究了一下网站的代码，网站所有的JS都是如下的加密形式：</p>
+<pre><code class="javascript">eval(function(p,a,c,k,e,d)&#123;e=function(c)&#123;return(c&lt;a?&quot;&quot;:e(parseInt(c/a)))+((c=c%a)&gt;35?String.fromCharCode(c+29):c.toString(36))&#125;;if(!&#39;&#39;.replace(/^/,String))&#123;while(c--)d[e(c)]=k[c]||e(c);k=[function(e)&#123;return d[e]&#125;];e=function()&#123;return&#39;\\w+&#39;&#125;;c=1&#125;;while(c--)if(k[c])p=p.replace(new RegExp(&#39;\\b&#39;+e(c)+&#39;\\b&#39;,&#39;g&#39;),k[c]);return p&#125;(&#39;1(&quot;0 2 4 3!&quot;)&#39;,5,5,&#39;js|alert|eval|amazing|is&#39;.split(&#39;|&#39;),0,&#123;&#125;))
+</code></pre>
+<p>格式化之后如下:</p>
+<pre><code class="javascript">eval(function(p, a, c, k, e, d) &#123;
+    e = function(c) &#123;
+        return (c &lt; a ? &quot;&quot;: e(parseInt(c / a))) + ((c = c % a) &gt; 35 ? String.fromCharCode(c + 29) : c.toString(36))
+    &#125;;
+    if (!&#39;&#39;.replace(/^/, String)) &#123;
+        while (c--) d[e(c)] = k[c] || e(c);
+        k = [function(e) &#123;
+            return d[e]
+        &#125;];
+        e = function() &#123;
+            return &#39;\\w+&#39;
+        &#125;;
+        c = 1;
+    &#125;;
+    while (c--) if (k[c]) p = p.replace(new RegExp(&#39;\\b&#39; + e(c) + &#39;\\b&#39;, &#39;g&#39;), k[c]);
+    return p;
+&#125; (&#39;1(&quot;0 2 4 3!&quot;)&#39;, 5, 5, &#39;js|alert|eval|amazing|is&#39;.split(&#39;|&#39;), 0, &#123;&#125;))
+</code></pre>
+<p>eval(function(p, a, c, k, e, d)这几个字符串，是一个常见的js加密混淆之后的输出结果。其中倒数第二第三行的</p>
+<pre><code class="javascript">while (c--) if (k[c]) p = p.replace(new RegExp(&#39;\\b&#39; + e(c) + &#39;\\b&#39;, &#39;g&#39;), k[c]);
+ return p;
+</code></pre>
+<p>就是该函数自带的解密函数，解密方式有很多种:</p>
+<ul>
+<li>把 eval 改成 document.write</li>
+<li>把 eval 改成 console.log</li>
+<li>把解密函数中的 return p 改成 document.getElementById(”textareaID”).innerText = p</li>
+</ul>
+<p>如果使用第一个方法，会遇到一个坑，当待解密的js中含有 &lt; (小于号) 或者 &gt; (大于号)的时候，会被解析成html的标签元素，导致解析失败，一个解决方案就是在头尾加入xmp元素标签：</p>
+<pre><code>document.write(&quot;&lt;xmp&gt;&quot;);
+/*eval*/  document.write(function(p,a,c,k,e,d)&#123;...&#125;(...));
+document.write(&quot;&lt;/xmp&gt;&quot;);
+</code></pre>
+<p>不过最简单的方案当然还是在线解析了：<a target="_blank" rel="noopener" href="http://tool.chinaz.com/js.aspx">http://tool.chinaz.com/js.aspx</a></p>
+<p>衍生话题：</p>
+<ul>
+<li><p>该网站的数据获取和提交也有许多加密方式，不过都是采用跨域的方式，所以可以直接在页面发起ajax请求和提交数据，不需要经过自己的服务端包装数据再转发到原提交网站。直接保存网站源代码稍作修改就可以使用，其中一个注意点就是该网站的查验结果是在iframe中显示，会存在跨域iframe操作问题，需要自己手动创建一个http服务器来解决该问题。</p>
+</li>
+<li><p>如果不是html页面端发送这些数据，例如安卓和IOS应用发送未加密的发票数据到<br>服务端的时候，我们需要在自己的服务端，将这些提交参数，加密成和原网站一样的加密数据之后，再转发到原提交网站。这时候服务端采用nodejs会极其方便，原网站html源码中的加密js方法都可以原封不动的挪用到后端直接使用，无需做不同语言之间的翻译过程。这可能也是用nodejs做爬虫的一大优势。</p>
+</li>
+<li><p>图片识别的部分，现在有很多现成的OCR可以用。</p>
+</li>
+<li><p>最后一个难点就是验证码识别了，该网站的验证码有很多反机器识别干扰，识别起来比较复杂。</p>
+</li>
+</ul>
+
+    </div>
+  </section>
+
+  
+  
+</article>
+      <script>NProgress.set(0.6);</script>
+    </main>
+    
+    <!-- <footer class="footer">
+  <div class="footer-wrap">
+    <div class="footer-link">
+      
+      <h3>LINKS</h3>
+      <p>
+        
+          <a href="http://1x0.xyz/" target="_blank">Tian1x0</a>
+        
+          <a href="http://www.royalmice.com/hankzhou/" target="_blank">Hankzhou</a>
+        
+          <a href="http://sjydh.me/" target="_blank">设计有点货</a>
+        
+          <a href="https://developers.google.com/web/fundamentals/" target="_blank">Web fundamentals</a>
+        
+      </p>
+      
+    </div>
+    <div class="footer-tags">
+      
+    </div>
+    <div class="footer-info">
+        <div>Theme <span class="codename"><a href="https://github.com/GGICE/hexo-icer" target="_blank">icer</a></span> designed & coded by <a href="https://ice.gs/" target="_blank">GGICE</a></div>
+        <div>Copyright &copy; 2026, <a href="/">超级大馒头</a>  . All rights reserved .</div>
+      </div>
+  </div>
+</footer>
+ -->
+
+    <script>NProgress.set(0.8);</script>
+    
+  </div>
+
+  <script src="/js/highlight.min.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+
+<script src="/js/main.js"></script>
+
+
+<!-- Commit -->
+
+
+
+  <script>
+    NProgress.done();
+  </script>
+  
+</body>
+</html>

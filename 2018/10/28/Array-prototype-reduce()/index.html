@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  
+  <title>Array.prototype.reduce() | 超级大馒头</title>
+  <meta name="description" content="A amazing blog." />
+  <meta name="keywords" content="hexo,theme,mantou,plus" />
+  <meta name="HandheldFriendly" content="True" />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="recude 函数为 js 数组中较难理解的一个函数，其定义如下：  定义arr.reduce(callback,[initialValue])  其中callback函数有四个参数： previousValue （第一次调用callback函数时候，previousValue值为reduce函数的第二个参数initialValue，如果没有initialValue则previousValue值为">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Array.prototype.reduce()">
+<meta property="og:url" content="http://example.com/2018/10/28/Array-prototype-reduce()/index.html">
+<meta property="og:site_name" content="超级大馒头">
+<meta property="og:description" content="recude 函数为 js 数组中较难理解的一个函数，其定义如下：  定义arr.reduce(callback,[initialValue])  其中callback函数有四个参数： previousValue （第一次调用callback函数时候，previousValue值为reduce函数的第二个参数initialValue，如果没有initialValue则previousValue值为">
+<meta property="og:locale">
+<meta property="article:published_time" content="2018-10-27T16:00:00.000Z">
+<meta property="article:modified_time" content="2023-02-11T16:14:32.000Z">
+<meta property="article:author" content="weixiaojie">
+<meta name="twitter:card" content="summary">
+  
+  
+    <link rel="icon" href="/image/favicon.ico">
+  
+
+  <link rel='stylesheet' href='/css/nprogress.css'/>
+  <link rel="stylesheet" href="/css/github-gist.min.css">
+  <link rel="stylesheet" href="/css/font_405585_yuudmyqpo3q.css">
+  <script src='/js/nprogress.min.js'></script>
+  <!-- <script>try{Typekit.load({ async: false });}catch(e){}</script> -->
+  
+<link rel="stylesheet" href="/style.css">
+
+  
+
+  
+
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+<body>
+  
+  <script>NProgress.start();</script>
+  
+  <div id="site-wrapper">
+    
+    <header class="header">
+  <div class="header-wrapper">
+    <a href="/">
+      <img src="/image/logo.jpg" class="logo"/>
+      <!-- <span class="site-desc">
+        
+      </span> -->
+    </a>
+    <div class="social-wrapper">
+      
+        
+          <a href="https://github.com/weixiaojie" class="social github" target="_blank" rel="external">
+            <span class="iconfont icon-github"></span>
+          </a>
+          
+          <a href="https://weibo.com/u/2156965395" class="social weibo" target="_blank" rel="external">
+            <span class="iconfont icon-weibo"></span>
+          </a>
+          
+          <a href="mailto:18565765503@163.com" class="social email" target="_blank" rel="external">
+            <span class="iconfont icon-email"></span>
+          </a>
+          
+      
+      
+      <a href="#" class="social search-do" target="_blank" rel="external">
+        <span class="iconfont icon-search"></span>
+      </a>
+            
+      <!-- <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><input type="hidden" name="sitesearch" value="http://example.com"></form> -->
+    </div>
+    <div class="search-wrap">
+      <div class="search-content animated fade-in">
+        <p class="search-input">
+          <span class="iconfont icon-search"></span>
+          <input tabindex="1">
+        </p>
+        <ul class="search-result">
+            
+        </ul>
+      </div>
+    </div>
+    <nav class="header-nav">
+      
+        <a href="/" class="archives">
+          首页
+        </a>
+        
+        <a href="/archives" class="archives">
+          归档
+        </a>
+        
+    </nav>
+  </div>
+</header>
+    <script>NProgress.set(0.4);</script>
+    
+    <main id="main" role="main">
+      <article id="post-Array-prototype-reduce()"
+  class="post article white-box article-type-post animated fade-in-top"
+  itemscope itemprop="blogPost">
+  <section class="post-header article-header">
+    <h2 class="title">
+        <a href="/2018/10/28/Array-prototype-reduce()/">
+          Array.prototype.reduce()
+        </a>
+      </h2>
+      <div class="subtitle">
+          <time>
+            2018年10月28日
+          </time>
+          
+      </div>
+  </section>
+  <section class="content">
+    <div class="article-entry" itemprop="articleBody">
+      <p>recude 函数为 js 数组中较难理解的一个函数，其定义如下：</p>
+<ul>
+<li><code>定义</code><pre><code class="javascript">arr.reduce(callback,[initialValue])
+</code></pre>
+其中callback函数有四个参数：</li>
+<li><code>previousValue</code> （第一次调用<code>callback</code>函数时候，<code>previousValue</code>值为<code>reduce</code>函数的第二个参数<code>initialValue</code>，如果没有<code>initialValue</code>则<code>previousValue</code>值为数组的第一个元素，<code>currentValue</code> 为第二个元素。第二次及以后的<code>callback</code>函数调用 <code>previousValue</code> 为上一次调用<code>callback</code>函数的返回结果）</li>
+<li><code>currentValue</code> （数组中当前被处理的元素）</li>
+<li><code>index</code> （当前元素在数组中的索引，一般不用）</li>
+<li><code>array</code> （调用 reduce 的数组，一般不用）</li>
+</ul>
+<p>用一句话来简单的概括就是：</p>
+<ul>
+<li>reduce函数，为数组中的每一个元素执行callback方法，并将每次callback方法的返回结果，作为下一次调用callback方法的参数 (通常也把这种思想叫做管道机制<code>pipeline</code>)</li>
+</ul>
+<p>reduce函数常见的使用场景有:</p>
+<ul>
+<li><p><code>数组的累加</code></p>
+<pre><code class="javascript">var arry = [1, 2, 3, 4, 5, 6, 7];
+var total = arry.reduce(function(sum, item) &#123;
+  return sum + item; 
+&#125;, 0);
+console.log(total);
+</code></pre>
+</li>
+<li><p><code>计算字符串中各字符的出现次数</code></p>
+<pre><code class="javascript">var str = &#39;abcdcbcddacabcdad&#39;;
+var result = str.split(&#39;&#39;).reduce(function(res, cur) &#123;
+  res[cur] ? res[cur] ++ : res[cur] = 1
+  return res;
+&#125;, &#123;&#125;)
+console.log(result);
+</code></pre>
+</li>
+<li><p><code>管道函数调用</code></p>
+<pre><code class="javascript">//假如有一个流程包含5个步骤，每一步的参数为上一步的执行结果
+var init = 0;
+function step5(arg)&#123;return arg + 5;&#125;;
+function step4(arg)&#123;return arg + 4;&#125;;
+function step3(arg)&#123;return arg + 3;&#125;;
+function step2(arg)&#123;return arg + 2;&#125;;
+function step1(arg)&#123;return arg + 1;&#125;;
+var result1  = step5( step4( step3( step2( step1( init ) ) ) ) );
+console.log(result1)
+//等价于以下的写法
+var result2 = [step1,step2,step3,step4,step5].reduce((a, b) =&gt; b(a), init);
+console.log(result2)
+</code></pre>
+</li>
+</ul>
+<p><code>reduce</code>为<code>ES5</code>中的一个新特性，所有使用<code>reduce</code>实现的功能其实都能用<code>for循环</code>来实现，一个简单的实现如下：</p>
+<pre><code>Array.prototype.reduce = function(callback, init) &#123;
+    var result;
+    for(var i = 0 ;i &lt; this.length; i++)&#123;
+        result = i == 0 ? callback(init, this[i]) : callback(result, this[i]);
+    &#125;
+    return result;
+&#125;
+</code></pre>
+<p>更为严谨的实现可以查看<a target="_blank" rel="noopener" href="https://github.com/es-shims/es5-shim/blob/master/es5-shim.js">es5-shim.js</a>中对<code>reduce</code>的实现</p>
+
+    </div>
+  </section>
+
+  
+  
+</article>
+      <script>NProgress.set(0.6);</script>
+    </main>
+    
+    <!-- <footer class="footer">
+  <div class="footer-wrap">
+    <div class="footer-link">
+      
+      <h3>LINKS</h3>
+      <p>
+        
+          <a href="http://1x0.xyz/" target="_blank">Tian1x0</a>
+        
+          <a href="http://www.royalmice.com/hankzhou/" target="_blank">Hankzhou</a>
+        
+          <a href="http://sjydh.me/" target="_blank">设计有点货</a>
+        
+          <a href="https://developers.google.com/web/fundamentals/" target="_blank">Web fundamentals</a>
+        
+      </p>
+      
+    </div>
+    <div class="footer-tags">
+      
+    </div>
+    <div class="footer-info">
+        <div>Theme <span class="codename"><a href="https://github.com/GGICE/hexo-icer" target="_blank">icer</a></span> designed & coded by <a href="https://ice.gs/" target="_blank">GGICE</a></div>
+        <div>Copyright &copy; 2026, <a href="/">超级大馒头</a>  . All rights reserved .</div>
+      </div>
+  </div>
+</footer>
+ -->
+
+    <script>NProgress.set(0.8);</script>
+    
+  </div>
+
+  <script src="/js/highlight.min.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+
+<script src="/js/main.js"></script>
+
+
+<!-- Commit -->
+
+
+
+  <script>
+    NProgress.done();
+  </script>
+  
+</body>
+</html>

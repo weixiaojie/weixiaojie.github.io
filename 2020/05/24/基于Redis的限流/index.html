@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  
+  <title>基于Redis的限流 | 超级大馒头</title>
+  <meta name="description" content="A amazing blog." />
+  <meta name="keywords" content="hexo,theme,mantou,plus" />
+  <meta name="HandheldFriendly" content="True" />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="以下代码演示同一个IP在30秒内只能获取一次验证码： 限流类型枚举 public enum LimitType &amp;#123;     &#x2F;&#x2F;自定义限流     CUSTOMER,     &#x2F;&#x2F;手机号限流     MOBILE,     &#x2F;&#x2F;IP限流     IP; &amp;#125;  定义限流注解 &#x2F;**  * 控制一个接口在指定时间内被访问次数限制  *&#x2F; @Target(ElementType.ME">
+<meta property="og:type" content="article">
+<meta property="og:title" content="基于Redis的限流">
+<meta property="og:url" content="http://example.com/2020/05/24/%E5%9F%BA%E4%BA%8ERedis%E7%9A%84%E9%99%90%E6%B5%81/index.html">
+<meta property="og:site_name" content="超级大馒头">
+<meta property="og:description" content="以下代码演示同一个IP在30秒内只能获取一次验证码： 限流类型枚举 public enum LimitType &amp;#123;     &#x2F;&#x2F;自定义限流     CUSTOMER,     &#x2F;&#x2F;手机号限流     MOBILE,     &#x2F;&#x2F;IP限流     IP; &amp;#125;  定义限流注解 &#x2F;**  * 控制一个接口在指定时间内被访问次数限制  *&#x2F; @Target(ElementType.ME">
+<meta property="og:locale">
+<meta property="article:published_time" content="2020-05-23T16:00:00.000Z">
+<meta property="article:modified_time" content="2023-03-25T11:58:24.000Z">
+<meta property="article:author" content="weixiaojie">
+<meta name="twitter:card" content="summary">
+  
+  
+    <link rel="icon" href="/image/favicon.ico">
+  
+
+  <link rel='stylesheet' href='/css/nprogress.css'/>
+  <link rel="stylesheet" href="/css/github-gist.min.css">
+  <link rel="stylesheet" href="/css/font_405585_yuudmyqpo3q.css">
+  <script src='/js/nprogress.min.js'></script>
+  <!-- <script>try{Typekit.load({ async: false });}catch(e){}</script> -->
+  
+<link rel="stylesheet" href="/style.css">
+
+  
+
+  
+
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+<body>
+  
+  <script>NProgress.start();</script>
+  
+  <div id="site-wrapper">
+    
+    <header class="header">
+  <div class="header-wrapper">
+    <a href="/">
+      <img src="/image/logo.jpg" class="logo"/>
+      <!-- <span class="site-desc">
+        
+      </span> -->
+    </a>
+    <div class="social-wrapper">
+      
+        
+          <a href="https://github.com/weixiaojie" class="social github" target="_blank" rel="external">
+            <span class="iconfont icon-github"></span>
+          </a>
+          
+          <a href="https://weibo.com/u/2156965395" class="social weibo" target="_blank" rel="external">
+            <span class="iconfont icon-weibo"></span>
+          </a>
+          
+          <a href="mailto:18565765503@163.com" class="social email" target="_blank" rel="external">
+            <span class="iconfont icon-email"></span>
+          </a>
+          
+      
+      
+      <a href="#" class="social search-do" target="_blank" rel="external">
+        <span class="iconfont icon-search"></span>
+      </a>
+            
+      <!-- <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><input type="hidden" name="sitesearch" value="http://example.com"></form> -->
+    </div>
+    <div class="search-wrap">
+      <div class="search-content animated fade-in">
+        <p class="search-input">
+          <span class="iconfont icon-search"></span>
+          <input tabindex="1">
+        </p>
+        <ul class="search-result">
+            
+        </ul>
+      </div>
+    </div>
+    <nav class="header-nav">
+      
+        <a href="/" class="archives">
+          首页
+        </a>
+        
+        <a href="/archives" class="archives">
+          归档
+        </a>
+        
+    </nav>
+  </div>
+</header>
+    <script>NProgress.set(0.4);</script>
+    
+    <main id="main" role="main">
+      <article id="post-基于Redis的限流"
+  class="post article white-box article-type-post animated fade-in-top"
+  itemscope itemprop="blogPost">
+  <section class="post-header article-header">
+    <h2 class="title">
+        <a href="/2020/05/24/%E5%9F%BA%E4%BA%8ERedis%E7%9A%84%E9%99%90%E6%B5%81/">
+          基于Redis的限流
+        </a>
+      </h2>
+      <div class="subtitle">
+          <time>
+            2020年05月24日
+          </time>
+          
+      </div>
+  </section>
+  <section class="content">
+    <div class="article-entry" itemprop="articleBody">
+      <p>以下代码演示同一个IP在30秒内只能获取一次验证码：</p>
+<p><strong>限流类型枚举</strong></p>
+<pre><code class="java">public enum LimitType &#123;
+    //自定义限流
+    CUSTOMER,
+    //手机号限流
+    MOBILE,
+    //IP限流
+    IP;
+&#125;
+</code></pre>
+<p><strong>定义限流注解</strong></p>
+<pre><code class="java">/**
+ * 控制一个接口在指定时间内被访问次数限制
+ */
+@Target(ElementType.METHOD)
+@Retention(RetentionPolicy.RUNTIME)
+public @interface Limit &#123;
+
+    // 资源名称，用于描述接口功能
+    String name() default &quot;&quot;;
+
+    // 资源 key
+    String key() default &quot;&quot;;
+
+    // redis中key的前缀
+    String prefix() default &quot;&quot;;
+
+    // 时间的，单位秒
+    int period();
+
+    // 限制访问次数
+    int count();
+
+    // 限制类型
+    LimitType limitType() default LimitType.CUSTOMER;
+&#125;
+</code></pre>
+<p><strong>使用Spring的Aspect拦截具有Limit注解的接口</strong></p>
+<pre><code class="java">@Slf4j
+@Aspect
+@Component
+public class LimitAspect &#123;
+
+    private final RedisTemplate&lt;String, Serializable&gt; limitRedisTemplate;
+
+    @Autowired
+    public LimitAspect(RedisTemplate&lt;String, Serializable&gt; limitRedisTemplate) &#123;
+        this.limitRedisTemplate = limitRedisTemplate;
+    &#125;
+
+    @Pointcut(&quot;@annotation(com.dpqwl.xunmishijie.common.annotation.Limit)&quot;)
+    public void pointcut() &#123;
+        // 拦截所有具有limit注解的bean
+    &#125;
+
+    @Around(&quot;pointcut()&quot;)
+    public Object around(ProceedingJoinPoint point) throws Throwable &#123;
+        HttpServletRequest request = ((ServletRequestAttributes) 
+            Objects.requireNonNull(RequestContextHolder.getRequestAttributes())).getRequest();
+        MethodSignature signature = (MethodSignature) point.getSignature();
+        Method method = signature.getMethod();
+        Limit limitAnnotation = method.getAnnotation(Limit.class);
+        LimitType limitType = limitAnnotation.limitType();
+        String name = limitAnnotation.name();
+        String key;
+        String ip = IPUtil.getIpAddr(request);
+        int limitPeriod = limitAnnotation.period();
+        int limitCount = limitAnnotation.count();
+        //判断限流的类型，可以是IP，手机号，自定义
+        switch (limitType) &#123;
+            case IP:
+                key = ip;
+                break;
+            case CUSTOMER:
+                key = limitAnnotation.key();
+                break;
+            case MOBILE:
+                key=request.getParameter(&quot;phoneNum&quot;);;
+                break;
+            default:
+                key = StringUtils.upperCase(method.getName());
+        &#125;
+        ImmutableList&lt;String&gt; keys = ImmutableList.of(StringUtils.join(limitAnnotation.prefix() + &quot;_&quot;, key));
+        String luaScript = buildLuaScript();
+        RedisScript&lt;Number&gt; redisScript = new DefaultRedisScript&lt;&gt;(luaScript, Number.class);
+        Number count = limitRedisTemplate.execute(redisScript, keys, limitCount, limitPeriod);
+        log.info(&quot;IP:&#123;&#125; 第 &#123;&#125; 次访问key为 &#123;&#125;，描述为 [&#123;&#125;] 的接口&quot;, ip, count, keys, name);
+        if (count != null &amp;&amp; count.intValue() &lt;= limitCount) &#123;
+            return point.proceed();
+        &#125; else &#123;
+            throw new LimitAccessException(&quot;访问频繁,稍后再试&quot;);
+        &#125;
+    &#125;
+
+    /**
+     * 限流脚本
+     * 调用的时候不超过阈值，则直接返回并执行计算器自加。
+     *
+     * @return lua脚本
+     */
+    private String buildLuaScript() &#123;
+        // \n表示回车换行 ARGV[1]表示参数1：限流次数，ARGV[2]表示参数2：过期时间
+        return &quot;local c&quot; +
+                &quot;\nc = redis.call(&#39;get&#39;,KEYS[1])&quot; +
+                &quot;\nif c and tonumber(c) &gt; tonumber(ARGV[1]) then&quot; +
+                &quot;\nreturn c;&quot; +
+                &quot;\nend&quot; +
+                &quot;\nc = redis.call(&#39;incr&#39;,KEYS[1])&quot; +
+                &quot;\nif tonumber(c) == 1 then&quot; +
+                &quot;\nredis.call(&#39;expire&#39;,KEYS[1],ARGV[2])&quot; +
+                &quot;\nend&quot; +
+                &quot;\nreturn c;&quot;;
+    &#125;
+
+&#125;
+</code></pre>
+<p>以上的 <strong>buildLuaScript</strong> 方法，是核心部分，取出对应key的值和限流次数比较（如果key不存在执行redis.call(‘incr’,KEYS[1])会自动设置key并初始化为0再加1）：</p>
+<ul>
+<li>如果当前次数大于限流次数，直接返回当前次数。</li>
+<li>如果当前次数小于限流次数，将当前key值加1，如果当前值为1，表示该时间段内第一次访问，则设置key的过期时间为限流策略的时间值，当key过期之后开始重新计数。</li>
+</ul>
+<p><strong>在接口上使用Limit注解</strong></p>
+<pre><code class="java">@GetMapping(&quot;/getCaptcha&quot;)
+@Limit(key = &quot;captcha&quot;, period = 30, count = 1, name = &quot;获取验证码&quot;, prefix = &quot;limit&quot;, limitType = LimitType.IP)
+public Response getCaptcha(@NotBlank String mobile)&#123;
+    //30秒内同一个IP地址只能调用一次该接口
+    return new Response().code(&quot;000&quot;).data(null).message(&quot;验证码获取成功!&quot;);
+&#125;
+</code></pre>
+<p>以上限流算法为固定窗口限流算法，其他限流算法可参考：<a target="_blank" rel="noopener" href="https://juejin.cn/post/7209504489010430010">常见限流算法</a></p>
+
+    </div>
+  </section>
+
+  
+  
+</article>
+      <script>NProgress.set(0.6);</script>
+    </main>
+    
+    <!-- <footer class="footer">
+  <div class="footer-wrap">
+    <div class="footer-link">
+      
+      <h3>LINKS</h3>
+      <p>
+        
+          <a href="http://1x0.xyz/" target="_blank">Tian1x0</a>
+        
+          <a href="http://www.royalmice.com/hankzhou/" target="_blank">Hankzhou</a>
+        
+          <a href="http://sjydh.me/" target="_blank">设计有点货</a>
+        
+          <a href="https://developers.google.com/web/fundamentals/" target="_blank">Web fundamentals</a>
+        
+      </p>
+      
+    </div>
+    <div class="footer-tags">
+      
+    </div>
+    <div class="footer-info">
+        <div>Theme <span class="codename"><a href="https://github.com/GGICE/hexo-icer" target="_blank">icer</a></span> designed & coded by <a href="https://ice.gs/" target="_blank">GGICE</a></div>
+        <div>Copyright &copy; 2026, <a href="/">超级大馒头</a>  . All rights reserved .</div>
+      </div>
+  </div>
+</footer>
+ -->
+
+    <script>NProgress.set(0.8);</script>
+    
+  </div>
+
+  <script src="/js/highlight.min.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+
+<script src="/js/main.js"></script>
+
+
+<!-- Commit -->
+
+
+
+  <script>
+    NProgress.done();
+  </script>
+  
+</body>
+</html>

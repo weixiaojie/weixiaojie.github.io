@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  
+  <title>苹果登录服务端验证 | 超级大馒头</title>
+  <meta name="description" content="A amazing blog." />
+  <meta name="keywords" content="hexo,theme,mantou,plus" />
+  <meta name="HandheldFriendly" content="True" />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="java版本：POM文件： &lt;?xml version&#x3D;&quot;1.0&quot; encoding&#x3D;&quot;UTF-8&quot;?&gt; &lt;project xmlns&#x3D;&quot;http:&#x2F;&#x2F;maven.apache.org&#x2F;POM&#x2F;4.0.0&quot;          xmlns:xsi&#x3D;&quot;http:&#x2F;&#x2F;www.w3.org&#x2F;2001&#x2F;XMLSchema">
+<meta property="og:type" content="article">
+<meta property="og:title" content="苹果登录服务端验证">
+<meta property="og:url" content="http://example.com/2020/05/26/%E8%8B%B9%E6%9E%9C%E7%99%BB%E5%BD%95%E6%9C%8D%E5%8A%A1%E7%AB%AF%E9%AA%8C%E8%AF%81/index.html">
+<meta property="og:site_name" content="超级大馒头">
+<meta property="og:description" content="java版本：POM文件： &lt;?xml version&#x3D;&quot;1.0&quot; encoding&#x3D;&quot;UTF-8&quot;?&gt; &lt;project xmlns&#x3D;&quot;http:&#x2F;&#x2F;maven.apache.org&#x2F;POM&#x2F;4.0.0&quot;          xmlns:xsi&#x3D;&quot;http:&#x2F;&#x2F;www.w3.org&#x2F;2001&#x2F;XMLSchema">
+<meta property="og:locale">
+<meta property="article:published_time" content="2020-05-25T16:00:00.000Z">
+<meta property="article:modified_time" content="2023-02-11T16:14:32.000Z">
+<meta property="article:author" content="weixiaojie">
+<meta name="twitter:card" content="summary">
+  
+  
+    <link rel="icon" href="/image/favicon.ico">
+  
+
+  <link rel='stylesheet' href='/css/nprogress.css'/>
+  <link rel="stylesheet" href="/css/github-gist.min.css">
+  <link rel="stylesheet" href="/css/font_405585_yuudmyqpo3q.css">
+  <script src='/js/nprogress.min.js'></script>
+  <!-- <script>try{Typekit.load({ async: false });}catch(e){}</script> -->
+  
+<link rel="stylesheet" href="/style.css">
+
+  
+
+  
+
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+<body>
+  
+  <script>NProgress.start();</script>
+  
+  <div id="site-wrapper">
+    
+    <header class="header">
+  <div class="header-wrapper">
+    <a href="/">
+      <img src="/image/logo.jpg" class="logo"/>
+      <!-- <span class="site-desc">
+        
+      </span> -->
+    </a>
+    <div class="social-wrapper">
+      
+        
+          <a href="https://github.com/weixiaojie" class="social github" target="_blank" rel="external">
+            <span class="iconfont icon-github"></span>
+          </a>
+          
+          <a href="https://weibo.com/u/2156965395" class="social weibo" target="_blank" rel="external">
+            <span class="iconfont icon-weibo"></span>
+          </a>
+          
+          <a href="mailto:18565765503@163.com" class="social email" target="_blank" rel="external">
+            <span class="iconfont icon-email"></span>
+          </a>
+          
+      
+      
+      <a href="#" class="social search-do" target="_blank" rel="external">
+        <span class="iconfont icon-search"></span>
+      </a>
+            
+      <!-- <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><input type="hidden" name="sitesearch" value="http://example.com"></form> -->
+    </div>
+    <div class="search-wrap">
+      <div class="search-content animated fade-in">
+        <p class="search-input">
+          <span class="iconfont icon-search"></span>
+          <input tabindex="1">
+        </p>
+        <ul class="search-result">
+            
+        </ul>
+      </div>
+    </div>
+    <nav class="header-nav">
+      
+        <a href="/" class="archives">
+          首页
+        </a>
+        
+        <a href="/archives" class="archives">
+          归档
+        </a>
+        
+    </nav>
+  </div>
+</header>
+    <script>NProgress.set(0.4);</script>
+    
+    <main id="main" role="main">
+      <article id="post-苹果登录服务端验证"
+  class="post article white-box article-type-post animated fade-in-top"
+  itemscope itemprop="blogPost">
+  <section class="post-header article-header">
+    <h2 class="title">
+        <a href="/2020/05/26/%E8%8B%B9%E6%9E%9C%E7%99%BB%E5%BD%95%E6%9C%8D%E5%8A%A1%E7%AB%AF%E9%AA%8C%E8%AF%81/">
+          苹果登录服务端验证
+        </a>
+      </h2>
+      <div class="subtitle">
+          <time>
+            2020年05月26日
+          </time>
+          
+      </div>
+  </section>
+  <section class="content">
+    <div class="article-entry" itemprop="articleBody">
+      <h3 id="java版本："><a href="#java版本：" class="headerlink" title="java版本："></a>java版本：</h3><p><code>POM文件：</code></p>
+<pre><code class="xml">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;project xmlns=&quot;http://maven.apache.org/POM/4.0.0&quot;
+         xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;
+         xsi:schemaLocation=&quot;http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd&quot;&gt;
+    &lt;modelVersion&gt;4.0.0&lt;/modelVersion&gt;
+
+    &lt;groupId&gt;org.example&lt;/groupId&gt;
+    &lt;artifactId&gt;AppleLogin&lt;/artifactId&gt;
+    &lt;version&gt;1.0-SNAPSHOT&lt;/version&gt;
+
+    &lt;repositories&gt;
+        &lt;repository&gt;
+            &lt;id&gt;nexus-aliyun&lt;/id&gt;
+            &lt;name&gt;Nexus aliyun&lt;/name&gt;
+            &lt;url&gt;http://maven.aliyun.com/nexus/content/groups/public&lt;/url&gt;
+        &lt;/repository&gt;
+    &lt;/repositories&gt;
+
+    &lt;dependencies&gt;
+
+        &lt;dependency&gt;
+            &lt;groupId&gt;com.alibaba&lt;/groupId&gt;
+            &lt;artifactId&gt;fastjson&lt;/artifactId&gt;
+            &lt;version&gt;1.2.51&lt;/version&gt;
+        &lt;/dependency&gt;
+
+        &lt;dependency&gt;
+            &lt;groupId&gt;org.jodd&lt;/groupId&gt;
+            &lt;artifactId&gt;jodd-http&lt;/artifactId&gt;
+            &lt;version&gt;4.3.2&lt;/version&gt;
+        &lt;/dependency&gt;
+
+        &lt;dependency&gt;
+            &lt;groupId&gt;com.auth0&lt;/groupId&gt;
+            &lt;artifactId&gt;java-jwt&lt;/artifactId&gt;
+            &lt;version&gt;3.4.1&lt;/version&gt;
+        &lt;/dependency&gt;
+
+        &lt;dependency&gt;
+            &lt;groupId&gt;org.projectlombok&lt;/groupId&gt;
+            &lt;artifactId&gt;lombok&lt;/artifactId&gt;
+            &lt;version&gt;1.18.8&lt;/version&gt;
+        &lt;/dependency&gt;
+
+        &lt;dependency&gt;
+            &lt;groupId&gt;ch.qos.logback&lt;/groupId&gt;
+            &lt;artifactId&gt;logback-classic&lt;/artifactId&gt;
+            &lt;version&gt;1.2.3&lt;/version&gt;
+        &lt;/dependency&gt;
+
+    &lt;/dependencies&gt;
+
+&lt;/project&gt;
+</code></pre>
+<p><code>苹果公钥地址返回结果映射实体类：</code></p>
+<pre><code class="java">import lombok.Data;
+
+import java.util.List;
+
+@Data
+public class AppleAuthKeys &#123;
+
+    private List&lt;Item&gt; keys;
+
+    @Data
+    public static class Item&#123;
+
+        private String kty;
+
+        private String kid;
+
+        private String use;
+
+        private String alg;
+
+        private String n;
+
+        private String e;
+
+    &#125;
+
+&#125;
+</code></pre>
+<p><code>校验工具类：</code></p>
+<pre><code class="java">import com.alibaba.fastjson.JSON;
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.JWTVerifier;
+import com.auth0.jwt.algorithms.Algorithm;
+import com.auth0.jwt.exceptions.JWTVerificationException;
+import com.auth0.jwt.interfaces.DecodedJWT;
+import jodd.http.HttpRequest;
+import lombok.extern.slf4j.Slf4j;
+import sun.security.rsa.RSAPublicKeyImpl;
+
+import java.io.IOException;
+import java.math.BigInteger;
+import java.security.InvalidKeyException;
+import java.util.List;
+
+@Slf4j
+public class JWTUtil &#123;
+
+    private static final String ISSUER = &quot;https://appleid.apple.com&quot;;
+
+    private static final String AUDIENCE = &quot;这里填写,app bundle id&quot;;
+
+    private static final String APPLE_AUTH_KEYS_URL = &quot;https://appleid.apple.com/auth/keys&quot;;
+
+    public static Boolean verifyAppleLoginToken(String token,String subject) throws IOException &#123;
+        //先从token中解析出HEADER部分的kid，然后从苹果提供的公钥获取url中获取生成rsa公钥所需的n和e
+        DecodedJWT decodedJWT = JWT.decode(token);
+        String kid = decodedJWT.getHeaderClaim(&quot;kid&quot;).asString();
+        String response = HttpRequest.get(APPLE_AUTH_KEYS_URL).send().body();
+        List&lt;AppleAuthKeys.Item&gt; keyList = JSON.parseObject(response, AppleAuthKeys.class).getKeys();
+        String n = null, e = null;
+        for (AppleAuthKeys.Item item : keyList) &#123;
+            if (item.getKid().equals(kid)) &#123;
+                n = item.getN();
+                e = item.getE();
+            &#125;
+        &#125;
+        if (null == n || null == e) &#123;
+            log.error(&quot;根据token解析出来的kid获取苹果公钥参数n和e失败,token:&#123;&#125;&quot;, token);
+            return false;
+        &#125;
+        //各个版本的base64解码实现不太一样，目前发现只有apache的base64可以解析成功
+        BigInteger bigIntModulus = new BigInteger(1, org.apache.commons.codec.binary.Base64.decodeBase64(n));
+        BigInteger bigIntPrivateExponent = new BigInteger(1, org.apache.commons.codec.binary.Base64.decodeBase64(e));
+        try &#123;
+            //使用生成的RSA公钥验证token的SIGNATURE部分是否合法，(同时验证ISSUER,SUBJECT,AUDIENCE是否合法)
+            RSAPublicKeyImpl rsaPublicKey = new RSAPublicKeyImpl(bigIntModulus, bigIntPrivateExponent);
+            Algorithm algorithm = Algorithm.RSA256(rsaPublicKey, null);
+            JWTVerifier verifier = JWT.require(algorithm)
+                    .withIssuer(ISSUER)
+                    .withSubject(subject)
+                    .withAudience(AUDIENCE)
+                    .build();
+            DecodedJWT jwt = verifier.verify(token);
+        &#125; catch (JWTVerificationException ex1) &#123;
+            log.error(&quot;苹果token检验失败,失败原因:&#123;&#125;,token:&#123;&#125;&quot;, ex1.getMessage(), token);
+            return false;
+        &#125; catch (InvalidKeyException ex2) &#123;
+            log.error(&quot;苹果token检验失败,公钥生成失败,失败原因:&#123;&#125;,token:&#123;&#125;&quot;, ex2.getMessage(), token);
+            return false;
+        &#125;
+        log.info(&quot;苹果登录token校验成功,n:&#123;&#125;,e:&#123;&#125;,token:&#123;&#125;&quot;, n, e, token);
+        return true;
+    &#125;
+
+    public static void main(String[] args) throws IOException &#123;
+        verifyAppleLoginToken(&quot;待验证的苹果登录token&quot;,&quot;待验证的用户唯一ID&quot;);
+    &#125;
+
+&#125;
+</code></pre>
+<h3 id="nodejs版本"><a href="#nodejs版本" class="headerlink" title="nodejs版本"></a>nodejs版本</h3><pre><code class="javascript">const NodeRSA = require(&quot;node-rsa&quot;);
+const axios = require(&quot;axios&quot;);
+const jwt = require(&quot;jsonwebtoken&quot;);
+
+async function getApplePublicKey(kid) &#123;
+  let res = await axios.request(&#123;
+    method: &quot;GET&quot;,
+    url: &quot;https://appleid.apple.com/auth/keys&quot;,
+    headers: &#123;
+      &quot;Content-Type&quot;: &quot;application/json&quot;
+    &#125;
+  &#125;);
+  let key = res.data.keys.filter(item =&gt; item.kid == kid)[0];
+  console.log(key);
+  const pubKey = new NodeRSA();
+  pubKey.importKey(
+    &#123; n: Buffer.from(key.n, &quot;base64&quot;), e: Buffer.from(key.e, &quot;base64&quot;) &#125;,
+    &quot;components-public&quot;
+  );
+  return pubKey.exportKey([&quot;public&quot;]);
+&#125;
+
+const audience = &quot;这里填写 app bundle id&quot;;
+
+async function verifyIdToken(token,subject) &#123;
+  const kid = jwt.decode(token, &#123; complete: true &#125;).header.kid;
+  const applePublicKey = await getApplePublicKey(kid);
+  console.log(applePublicKey);
+  const jwtClaims = jwt.verify(token, applePublicKey, &#123;
+    algorithms: &quot;RS256&quot;,
+    issuer: &quot;https://appleid.apple.com&quot;,
+    audience: audience,
+    subject: subject
+  &#125;);
+  jwt.verify(token, applePublicKey, &#123; algorithms: &quot;RS256&quot; &#125;, (err, decode) =&gt; &#123;
+    if (err) &#123;
+      console.log(&quot;token验证失败:&quot;, err.message);
+    &#125; else if (decode) &#123;
+      console.log(&quot;token验证成功：&quot;, decode);
+    &#125;
+  &#125;);
+&#125;
+
+verifyIdToken(&quot;待验证的token&quot;,&quot;用户唯一ID&quot;);
+</code></pre>
+
+    </div>
+  </section>
+
+  
+  
+</article>
+      <script>NProgress.set(0.6);</script>
+    </main>
+    
+    <!-- <footer class="footer">
+  <div class="footer-wrap">
+    <div class="footer-link">
+      
+      <h3>LINKS</h3>
+      <p>
+        
+          <a href="http://1x0.xyz/" target="_blank">Tian1x0</a>
+        
+          <a href="http://www.royalmice.com/hankzhou/" target="_blank">Hankzhou</a>
+        
+          <a href="http://sjydh.me/" target="_blank">设计有点货</a>
+        
+          <a href="https://developers.google.com/web/fundamentals/" target="_blank">Web fundamentals</a>
+        
+      </p>
+      
+    </div>
+    <div class="footer-tags">
+      
+    </div>
+    <div class="footer-info">
+        <div>Theme <span class="codename"><a href="https://github.com/GGICE/hexo-icer" target="_blank">icer</a></span> designed & coded by <a href="https://ice.gs/" target="_blank">GGICE</a></div>
+        <div>Copyright &copy; 2026, <a href="/">超级大馒头</a>  . All rights reserved .</div>
+      </div>
+  </div>
+</footer>
+ -->
+
+    <script>NProgress.set(0.8);</script>
+    
+  </div>
+
+  <script src="/js/highlight.min.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+
+<script src="/js/main.js"></script>
+
+
+<!-- Commit -->
+
+
+
+  <script>
+    NProgress.done();
+  </script>
+  
+</body>
+</html>

@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  
+  <title>为什么银行需要集中作业系统 | 超级大馒头</title>
+  <meta name="description" content="A amazing blog." />
+  <meta name="keywords" content="hexo,theme,mantou,plus" />
+  <meta name="HandheldFriendly" content="True" />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;笔者从毕业开始做银行集中作业系统，中间兜兜转转了几家不同业务的公司，如今又回到了银行做集中作业系统，缘分总是这么奇妙。  &amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;上图是一张典型的银行集中作业架构图，在讲集中作业之前，我们需要先了解下，传统银行非集中作业模式存在的几个问题： **成本高**  &amp;n">
+<meta property="og:type" content="article">
+<meta property="og:title" content="为什么银行需要集中作业系统">
+<meta property="og:url" content="http://example.com/2025/03/17/%E4%B8%BA%E4%BB%80%E4%B9%88%E9%93%B6%E8%A1%8C%E9%9C%80%E8%A6%81%E9%9B%86%E4%B8%AD%E4%BD%9C%E4%B8%9A%E7%B3%BB%E7%BB%9F/index.html">
+<meta property="og:site_name" content="超级大馒头">
+<meta property="og:description" content="&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;笔者从毕业开始做银行集中作业系统，中间兜兜转转了几家不同业务的公司，如今又回到了银行做集中作业系统，缘分总是这么奇妙。  &amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;上图是一张典型的银行集中作业架构图，在讲集中作业之前，我们需要先了解下，传统银行非集中作业模式存在的几个问题： **成本高**  &amp;n">
+<meta property="og:locale">
+<meta property="og:image" content="http://example.com/image/15.png">
+<meta property="og:image" content="http://example.com/image/16.png">
+<meta property="article:published_time" content="2025-03-16T16:00:00.000Z">
+<meta property="article:modified_time" content="2025-12-29T01:55:47.474Z">
+<meta property="article:author" content="weixiaojie">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/image/15.png">
+  
+  
+    <link rel="icon" href="/image/favicon.ico">
+  
+
+  <link rel='stylesheet' href='/css/nprogress.css'/>
+  <link rel="stylesheet" href="/css/github-gist.min.css">
+  <link rel="stylesheet" href="/css/font_405585_yuudmyqpo3q.css">
+  <script src='/js/nprogress.min.js'></script>
+  <!-- <script>try{Typekit.load({ async: false });}catch(e){}</script> -->
+  
+<link rel="stylesheet" href="/style.css">
+
+  
+
+  
+
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+<body>
+  
+  <script>NProgress.start();</script>
+  
+  <div id="site-wrapper">
+    
+    <header class="header">
+  <div class="header-wrapper">
+    <a href="/">
+      <img src="/image/logo.jpg" class="logo"/>
+      <!-- <span class="site-desc">
+        
+      </span> -->
+    </a>
+    <div class="social-wrapper">
+      
+        
+          <a href="https://github.com/weixiaojie" class="social github" target="_blank" rel="external">
+            <span class="iconfont icon-github"></span>
+          </a>
+          
+          <a href="https://weibo.com/u/2156965395" class="social weibo" target="_blank" rel="external">
+            <span class="iconfont icon-weibo"></span>
+          </a>
+          
+          <a href="mailto:18565765503@163.com" class="social email" target="_blank" rel="external">
+            <span class="iconfont icon-email"></span>
+          </a>
+          
+      
+      
+      <a href="#" class="social search-do" target="_blank" rel="external">
+        <span class="iconfont icon-search"></span>
+      </a>
+            
+      <!-- <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><input type="hidden" name="sitesearch" value="http://example.com"></form> -->
+    </div>
+    <div class="search-wrap">
+      <div class="search-content animated fade-in">
+        <p class="search-input">
+          <span class="iconfont icon-search"></span>
+          <input tabindex="1">
+        </p>
+        <ul class="search-result">
+            
+        </ul>
+      </div>
+    </div>
+    <nav class="header-nav">
+      
+        <a href="/" class="archives">
+          首页
+        </a>
+        
+        <a href="/archives" class="archives">
+          归档
+        </a>
+        
+    </nav>
+  </div>
+</header>
+    <script>NProgress.set(0.4);</script>
+    
+    <main id="main" role="main">
+      <article id="post-为什么银行需要集中作业系统"
+  class="post article white-box article-type-post animated fade-in-top"
+  itemscope itemprop="blogPost">
+  <section class="post-header article-header">
+    <h2 class="title">
+        <a href="/2025/03/17/%E4%B8%BA%E4%BB%80%E4%B9%88%E9%93%B6%E8%A1%8C%E9%9C%80%E8%A6%81%E9%9B%86%E4%B8%AD%E4%BD%9C%E4%B8%9A%E7%B3%BB%E7%BB%9F/">
+          为什么银行需要集中作业系统
+        </a>
+      </h2>
+      <div class="subtitle">
+          <time>
+            2025年03月17日
+          </time>
+          
+      </div>
+  </section>
+  <section class="content">
+    <div class="article-entry" itemprop="articleBody">
+      <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;笔者从毕业开始做银行集中作业系统，中间兜兜转转了几家不同业务的公司，如今又回到了银行做集中作业系统，缘分总是这么奇妙。</p>
+<p><img src="/image/15.png" alt="集中作业架构图"></p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;上图是一张典型的银行集中作业架构图，在讲集中作业之前，我们需要先了解下，传统银行非集中作业模式存在的几个问题：</p>
+<pre><code>**成本高**
+</code></pre>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;银行在不断发展壮大之后，会存在大量的网点机构。由于银行业务众多，存款，贷款，开户，票据，转账，投资理财，信用卡等等，通常一个人是无法掌握所有业务的，所以传统银行的网点就要配置各种业务人员，甚至一个业务要配置多个人员，例如信用卡办理，包括资料审核员、征信检查员、风控人员等。即便部分偏远分行可能1个星期才有一笔信用卡业务，也不可避免的需要配置信用卡业务人员。在大型银行的众多网点中，人力成本居高不下。</p>
+<pre><code>**效率低**
+</code></pre>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;以客户开户为例，通常一个客户开户需要填写开户申请书，柜员除了扫描纸质开户申请书以外，还需要将客户填写的纸质文件内容录入到系统当中，包括姓名，地址，电话，职业，是否银行内部人员，等等。做过对公开户的朋友应该都知道，开户要录入系统的字段少则几十个，动则上百个，一个柜员要将这些字段录完需要花费大量的时间，这必然会导致客户排队等待，体验不佳，一些没有耐心的客户更是直接选择换家银行开户。新客户对银行的重要性就和国家人口出生率一样，没有增长仅靠存量最终只会走向衰败。</p>
+<pre><code>**服务标准不统一**
+</code></pre>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;依旧以开户为例，企业客户要在银行开设对公账户（公司账户），过去的开户流程通常由各分行独立处理，例如，A分行可能要求企业提供额外的财务报表，而B分行不要求，导致企业开户体验不一致。可能出现某企业在A分行开户时被拒，但在B分行成功开户的情况。</p>
+<pre><code>**存在安全合规问题**
+</code></pre>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;以贷款为例，A 分行要求所有贷款审批必须有两级复核，而 B 分行可能只需要一级复核，导致审核漏洞。领导利用自己的权限，和下属员工共同舞弊，即贷款业务的柜面提交人员和审核人员串通一气，为自己的亲戚朋友非法贷款。</p>
+<br>
+
+<p><img src="/image/16.png" alt="集中作业架构图"></p>
+<br>
+
+<p>回看开头的图片，我们来看看集中作业系统，是如何解决以上几个问题的:</p>
+<pre><code>**降低成本**
+</code></pre>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;从文首的图片可以看到，各个网点只剩下一个业务人员（为了理解夸张描述），负责的任务比较简单，初步审核客户填写的资料，然后从系统扫描纸质文件提交，等待后台人员处理任务即可。如此网点人员便可大幅精简，极大减少网点成本。而后台人员时刻都在不停获取不同分行的任务，处理任务，单个人员工作效率拉满。就不会存在某些网点由于一整天可能都没有一笔信用卡业务导致人员闲置，而有些网点又大量人员排队的情况。</p>
+<pre><code> **提高效率**
+</code></pre>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;上文我们讲到柜员一个人录入开户信息耗费大量时间，到集中作业之后，柜员提交的一个影像凭证，就会被系统切割成多个不同要素的图片，有多个外包人员共同录入不同部分，这就好比老师审核试卷，由一个人审核一份试卷，到不同的老师每个人审核一张试卷的不同题目，效率自然成倍提升。</p>
+<pre><code> **标准统一**
+</code></pre>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;由于柜面只负责扫描凭证，而录入和审核等任务都集中由后台作业中心的人员处理，统一培训的作业人员，审核标准自然都是一致的，就不存在A分行可以开户成功，而B分行无法开户成功的情况存在了。</p>
+<pre><code> **控制风险**
+</code></pre>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;柜员扫描凭证提交之后，后台任务将会被随机分配给后台不同的作业人员处理，内部员工之间想要串通一气的做法将变得困难，合规风险自然就降低了。</p>
+
+    </div>
+  </section>
+
+  
+  
+</article>
+      <script>NProgress.set(0.6);</script>
+    </main>
+    
+    <!-- <footer class="footer">
+  <div class="footer-wrap">
+    <div class="footer-link">
+      
+      <h3>LINKS</h3>
+      <p>
+        
+          <a href="http://1x0.xyz/" target="_blank">Tian1x0</a>
+        
+          <a href="http://www.royalmice.com/hankzhou/" target="_blank">Hankzhou</a>
+        
+          <a href="http://sjydh.me/" target="_blank">设计有点货</a>
+        
+          <a href="https://developers.google.com/web/fundamentals/" target="_blank">Web fundamentals</a>
+        
+      </p>
+      
+    </div>
+    <div class="footer-tags">
+      
+    </div>
+    <div class="footer-info">
+        <div>Theme <span class="codename"><a href="https://github.com/GGICE/hexo-icer" target="_blank">icer</a></span> designed & coded by <a href="https://ice.gs/" target="_blank">GGICE</a></div>
+        <div>Copyright &copy; 2026, <a href="/">超级大馒头</a>  . All rights reserved .</div>
+      </div>
+  </div>
+</footer>
+ -->
+
+    <script>NProgress.set(0.8);</script>
+    
+  </div>
+
+  <script src="/js/highlight.min.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+
+<script src="/js/main.js"></script>
+
+
+<!-- Commit -->
+
+
+
+  <script>
+    NProgress.done();
+  </script>
+  
+</body>
+</html>
